@@ -1,0 +1,50 @@
+﻿@page "/strutture/{FatherBuildingId:guid}/piani/{FatherLevelId:guid}/piattaforme-monitor"
+@attribute [Authorize(Roles = "Admin")]
+@inherits MonitorPlatformsInLevelBase
+
+<h3>Piattaforme Monitor nel Piano</h3>
+<p>La Password non viene visualizzata per il "ShouldSerializePassword" nella classe dell'entita' MonitorPlatform lato servers</p>
+<br>
+<AuthorizeView>
+    <Authorized>
+        <AddPlatformInLevel PlatformAdded="@HandleOnAddedPlatform" FatherLevelId="FatherLevelId"/>
+        <br>
+        @if(this.MonitorPlatforms.Count == 0)
+        {
+            <p>Loading...</p>    
+        }
+        else
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Codice Piattaforma Monitor</th>
+                        <th>Nome Credenziali</th>
+                        <th>Password</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var platform in MonitorPlatforms)
+                    {
+                        <tr>
+                            <td>@platform.MonitorCode</td>
+                            <td>@platform.Name</td>
+                            <td>@platform.Password</td>
+                            <td>
+                                <button class="btn-warning" @onclick="() => ModifyPlatform(platform.Id)">Modifica</button>
+                            </td>
+                            <td>
+                                <button class="btn-danger" @onclick="() => DeletePlatform(platform.Id)">Elimina</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>        
+        }
+    </Authorized>
+    <NotAuthorized>
+        Not Authorized: try Login
+    </NotAuthorized>
+</AuthorizeView>

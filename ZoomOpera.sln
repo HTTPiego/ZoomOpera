@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32526.322
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZoomOpera.Server", "ZoomOpera\Server\ZoomOpera.Server.csproj", "{AC1FB247-F50E-4D34-BF7B-EDB0CA3F1E1A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZoomOpera.Client", "ZoomOpera\Client\ZoomOpera.Client.csproj", "{7866C85B-FA69-4E4E-82B5-D102A581B2BC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZoomOpera.Shared", "ZoomOpera\Shared\ZoomOpera.Shared.csproj", "{DBA7789E-5532-4662-B0B5-BFA439838D66}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZoomOpera.DTOs", "ZoomOpera.Shared.DTOs\ZoomOpera.DTOs.csproj", "{EAA6FC1C-0D8D-4080-A3DB-26F53CD0081B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZoomOpera.CartersianPlane", "ZoomOpera.CartersianPlane\ZoomOpera.CartersianPlane.csproj", "{43D50C85-C544-45FB-A11E-D0F35DDC02C6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AC1FB247-F50E-4D34-BF7B-EDB0CA3F1E1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC1FB247-F50E-4D34-BF7B-EDB0CA3F1E1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC1FB247-F50E-4D34-BF7B-EDB0CA3F1E1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC1FB247-F50E-4D34-BF7B-EDB0CA3F1E1A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7866C85B-FA69-4E4E-82B5-D102A581B2BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7866C85B-FA69-4E4E-82B5-D102A581B2BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7866C85B-FA69-4E4E-82B5-D102A581B2BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7866C85B-FA69-4E4E-82B5-D102A581B2BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBA7789E-5532-4662-B0B5-BFA439838D66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBA7789E-5532-4662-B0B5-BFA439838D66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBA7789E-5532-4662-B0B5-BFA439838D66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBA7789E-5532-4662-B0B5-BFA439838D66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EAA6FC1C-0D8D-4080-A3DB-26F53CD0081B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAA6FC1C-0D8D-4080-A3DB-26F53CD0081B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAA6FC1C-0D8D-4080-A3DB-26F53CD0081B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAA6FC1C-0D8D-4080-A3DB-26F53CD0081B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43D50C85-C544-45FB-A11E-D0F35DDC02C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43D50C85-C544-45FB-A11E-D0F35DDC02C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43D50C85-C544-45FB-A11E-D0F35DDC02C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43D50C85-C544-45FB-A11E-D0F35DDC02C6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E11066E2-E159-4BBC-B02D-8E72DAA1B22B}
+	EndGlobalSection
+EndGlobal

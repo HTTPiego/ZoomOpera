@@ -1,0 +1,21 @@
+﻿@page "/strutture/{FatherBuildingId:guid}/piani/aggiungi-piano"
+@attribute [Authorize(Roles = "Admin")]
+@inherits AddLevelInBuildingBase
+
+<h4>Aggiungi Piano in Struttura</h4>
+
+<div>
+     
+    <EditForm Model="@LevelToAdd" OnSubmit="@AddLevel">
+        <DataAnnotationsValidator />
+         <label class="form-label" for="number">Numero Piano</label>
+         <InputNumber id="number" @bind-Value="LevelToAdd.LevelNumber"/>
+         <ValidationMessage For="@(() => LevelToAdd.LevelNumber)" />
+         <br />
+         <label class="form-label" for="planimetry">Planimetria</label>
+         <InputFile OnChange="OnUploadedPlanimetry" id="planimetry" />
+         <ValidationMessage For="@(() => LevelToAdd.Planimetry)" />
+         <br />
+         <button class="btn-success" type="submit">Aggiungi Piano</button>
+    </EditForm>
+</div>

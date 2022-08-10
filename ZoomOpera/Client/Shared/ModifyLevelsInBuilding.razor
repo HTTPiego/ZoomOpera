@@ -1,0 +1,31 @@
+﻿@page "/strutture/{FatherBuildingId:guid}/piani/{LevelToModifyId:guid}/modifica-piano"
+@attribute [Authorize(Roles = "Admin")]
+@inherits ModifyLevelsinBuidingBase
+
+<h3>Modifica Piano della Struttura</h3>
+
+<div>
+    <EditForm Model="@UpdatingLevel" OnSubmit="@ModifyLevel">
+        <DataAnnotationsValidator />
+         <label class="form-label" for="number">Numero Piano</label>
+         <InputNumber id="number" @bind-Value="UpdatingLevel.LevelNumber"/>
+         <ValidationMessage For="@(() => UpdatingLevel.LevelNumber)" />
+         <br />
+         <label class="form-label" for="planimetry">Planimetria</label>
+         <InputFile OnChange="OnUploadedPlanimetry" id="planimetry" />
+         <ValidationMessage For="@(() => UpdatingLevel.Planimetry)" />
+         <p>Attuale Planimetria:</p>
+        @if (String.IsNullOrEmpty(@UpdatingLevel.Planimetry))
+        {
+            <p class="text-danger">Planimetria non ancora caricata</p>
+        }
+        else
+        {
+            <div class="col-12">
+                <img src="@UpdatingLevel.Planimetry" />    
+            </div>
+        }
+        <br /> <br />
+        <button class="btn-success" type="submit">Conferma</button>
+    </EditForm>
+</div>

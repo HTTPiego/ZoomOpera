@@ -1,0 +1,22 @@
+﻿@page "/strutture/{BuildingToModifyId:guid}/modifica-struttura"
+@attribute [Authorize(Roles = "Admin")]
+@inherits ModifyBuildingBase
+
+<h3>Modifica Struttura</h3>
+
+
+<div>
+    <EditForm Model="@UpdatingBuilding" OnSubmit="@ModifyBuilding">
+        <DataAnnotationsValidator />
+         <label class="form-label" for="name">Nome Stuttura</label>
+         <InputText id="name" @bind-Value="UpdatingBuilding.Name"/>
+         <ValidationMessage For="@(() => UpdatingBuilding.Name)" />
+         <br />
+         <label class="form-label" for="Code">Codice Struttura</label>
+         <InputText id="code" @bind-Value="UpdatingBuilding.BuildingCode"/>
+         <ValidationMessage For="@(() => UpdatingBuilding.BuildingCode)" />
+         <br />
+         <button class="btn-primary" type="submit">Conferma</button>
+    </EditForm>
+</div>
+

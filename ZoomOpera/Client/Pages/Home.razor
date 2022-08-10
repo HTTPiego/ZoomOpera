@@ -1,0 +1,22 @@
+﻿@page "/home"
+@attribute [Authorize(Roles = "Admin, MonitorPlatform")]
+
+<h3>Home</h3>
+
+<AuthorizeView>
+    <Authorized>
+        <NavLink class="nav-link" href="strutture">
+            <span aria-hidden="true"></span> Gestisci Sistema
+        </NavLink>
+        <span>@context.User.Identity.Name</span>
+    </Authorized>
+    <NotAuthorized>
+        Not Authorized: try Login
+    </NotAuthorized>
+</AuthorizeView>
+
+
+
+@code {
+
+}

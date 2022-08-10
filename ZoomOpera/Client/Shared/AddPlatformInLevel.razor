@@ -1,0 +1,27 @@
+﻿@page "/strutture/{FatherBuildingId:guid}/piani/{FatherLevelId:guid}/piattaforme-monitor/aggiungi-piattaforma"
+@attribute [Authorize(Roles = "Admin")]
+@inherits AddPlatformInLevelBase
+
+<h3>Aggiungi Piattaforma Monitor nel Piano</h3>
+
+<div>
+    <EditForm Model="@PlatformToAdd" OnSubmit="@AddPlatform">
+        <DataAnnotationsValidator />
+         <label class="form-label" for="code">Codice Piattaform Monitor</label>
+         <br />
+         <InputText id="code" @bind-Value="PlatformToAdd.MonitorCode"/>
+         <ValidationMessage For="@(() => PlatformToAdd.MonitorCode)" />
+         <br />
+         <label class="form-label" for="name">Nome Credenziali</label>
+         <br />
+         <InputText id="name" @bind-Value="PlatformToAdd.Name"/>
+         <ValidationMessage For="@(() => PlatformToAdd.Name)" />
+         <br />
+         <label class="form-label" for="password">Password</label>
+         <br />
+         <InputText id="name" @bind-Value="PlatformToAdd.Password"/>
+         <ValidationMessage For="@(() => PlatformToAdd.Password)" />
+         <br /> <br />
+         <button class="btn-success" type="submit">Aggiungi Piattaforma Monitor</button>
+    </EditForm>
+</div>

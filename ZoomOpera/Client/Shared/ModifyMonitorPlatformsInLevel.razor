@@ -1,0 +1,27 @@
+﻿@page "/strutture/{FatherBuildingId:guid}/piani/{FatherLevelId:guid}/piattaforme-monitor/{PlatformToModifyId:guid}/modifica-piattaforma"
+@attribute [Authorize(Roles = "Admin")]
+@inherits ModifyMonitorPlatformInLevelBase
+
+<h3>Modifica Piattaforma Monitor nel Piano</h3>
+
+<div>
+    <EditForm Model="@UpdatingPlatform" OnSubmit="@ModifyPlatform">
+        <DataAnnotationsValidator />
+         <label class="form-label" for="code">Codice Piattaform Monitor</label>
+         <br />
+         <InputText id="code" @bind-Value="UpdatingPlatform.MonitorCode"/>
+         <ValidationMessage For="@(() => UpdatingPlatform.MonitorCode)" />
+         <br />
+         <label class="form-label" for="name">Nome Credenziali</label>
+         <br />
+         <InputText id="name" @bind-Value="UpdatingPlatform.Name"/>
+         <ValidationMessage For="@(() => UpdatingPlatform.Name)" />
+         <br />
+         <label class="form-label" for="password">Password</label>
+         <br />
+         <InputText id="name" @bind-Value="UpdatingPlatform.Password"/>
+         <ValidationMessage For="@(() => UpdatingPlatform.Password)" />
+         <br /> <br />
+         <button class="btn-success" type="submit">Conferma</button>
+    </EditForm>
+</div>

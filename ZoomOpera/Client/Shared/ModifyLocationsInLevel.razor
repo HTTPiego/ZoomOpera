@@ -1,0 +1,22 @@
+﻿@page "/strutture/{FatherBuildingId:guid}/piani/{FatherLevelId:guid}/locazioni/{LocationToModifyId:guid}/modifica-locazione"
+@attribute [Authorize(Roles = "Admin")]
+@inherits ModifyLocationsInLevelBase
+
+<h3>Modifica Locazione Opera nel Piano</h3>
+
+<div>
+    <EditForm Model="@UpdatingLocation" OnSubmit="@ModifyLocation">
+        <DataAnnotationsValidator />
+         <label class="form-label" for="code">Codice Locazione</label>
+         <br />
+         <InputText id="code" @bind-Value="UpdatingLocation.LocationCode"/>
+         <ValidationMessage For="@(() => UpdatingLocation.LocationCode)" />
+         <br />
+         <label class="form-label" for="notes">Note</label>
+         <br />
+         <InputTextArea id="notes" @bind-Value="UpdatingLocation.Notes"/>
+         <ValidationMessage For="@(() => UpdatingLocation.Notes)" />
+         <br /> <br />
+         <button class="btn-success" type="submit">Conferma</button>
+    </EditForm>
+</div>

@@ -1,0 +1,60 @@
+﻿@page "/strutture/{FatherBuildingId:guid}/piani/{FatherLevelId:guid}/locazioni-opere"
+@attribute [Authorize(Roles = "Admin")]
+@inherits LocationsInLevelBase
+
+<h2>Locazioni Opere nel Piano</h2>
+<br>
+<AuthorizeView>
+    <Authorized>
+        <AddLocationInLevel LocationAdded="@HandleOnAddedLocation" FatherLevelId="FatherLevelId"/>
+        <br>
+        @if(this.Locations.Count == 0)
+        {
+            <p>Loading...</p>    
+        }
+        else
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Codice Locazione</th>
+                        <th>Note</th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var location in Locations)
+                    {
+                        <tr>
+                            <td>@location.LocationCode</td>
+                            <td>@location.Notes</td>
+                            @if (@location.Opera != null)
+                            {
+                                <td>
+                                    <button class="btn-link" @onclick="() => GoToOpera(location.Id)">Vai all'Opera</button>
+                                </td>
+                            }
+                            else
+                            {
+                                <td>
+                                    <button class="btn-link" @onclick="() => AddNewOpera(location.Id)">Aggiungi Opera</button>
+                                </td>
+                            }
+                            <td>
+                                <button class="btn-warning" @onclick="() => ModifyLocation(location.Id)">Modifica</button>
+                            </td>
+                            <td>
+                                <button class="btn-danger" @onclick="() => DeleteLocation(location.Id)">Elimina</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>        
+        }
+    </Authorized>
+    <NotAuthorized>
+        Not Authorized: try Login
+    </NotAuthorized>
+</AuthorizeView>

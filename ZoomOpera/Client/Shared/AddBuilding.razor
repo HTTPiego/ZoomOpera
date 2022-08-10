@@ -1,0 +1,20 @@
+﻿@page "/strutture/aggiungi-struttura"
+@attribute [Authorize(Roles = "Admin")]
+@inherits AddBuildingBase
+
+<h4>Aggiungi Struttura</h4>
+
+<div>
+    <EditForm Model="@BuildingToAdd" OnSubmit="@AddBuilding">
+        <DataAnnotationsValidator />
+         <label class="form-label" for="name">Nome Stuttura</label>
+         <InputText id="name" @bind-Value="BuildingToAdd.Name"/>
+         <ValidationMessage For="@(() => BuildingToAdd.Name)" />
+         <br />
+         <label class="form-label" for="code">Codice Struttura</label>
+         <InputText id="code" @bind-Value="BuildingToAdd.BuildingCode"/>
+         <ValidationMessage For="@(() => BuildingToAdd.BuildingCode)" />
+         <br />
+         <button class="btn-success" type="submit">Aggiungi Struttura</button>
+    </EditForm>
+</div>

@@ -1,0 +1,59 @@
+﻿@page "/strutture/{FatherBuildingId:guid}/piani/{FatherLevelId:guid}/locazioni-opere/{FatherLocationId:guid}/opera/{OperaToDetailId:guid}/descrizioni-dettagliate"
+@inherits AddOperaDetailsBase
+
+<h3>Aggiungi Descrizioni Dettagliate</h3>
+
+<div>
+    <img src="@OperaImageToDetail.Image" usemap="#operaToDetail"/>
+
+    @*<map name="operaToDetail"> 
+
+    </map>*@
+
+    <br />
+    <h5>Aggiungi descrizioni dettagliate su diversi tipi di area:</h5>
+
+    @*@bind="@SelectedImageMapShape"*@
+    <select @onchange="ManageShapeSelection">
+       @foreach (var shape in ImageMapShapes)
+       {
+            @if (shape.Equals(ImageMapShapes.First()))
+            {
+                <option selected>@shape </option>
+                @*<option value="@shape" selected>  @shape </option>*@
+            }
+            else
+            {
+                <option>@shape </option>
+                @*<option value="@shape"> @shape </option>*@
+            }
+       }
+    </select>
+    <p>@SelectedImageMapShape</p>
+    <br />
+    @*<button class="btn-close" @onclick="DeleteLastCoordinate">Indietro</button>*@
+</div>
+
+<div>
+    <EditForm Model="@ImageMapToAdd" OnSubmit="AddImageMap">
+        <DataAnnotationsValidator />
+        <label class="form-label" for="title">Titolo descrizione dettagliata:</label>
+         <InputText id="title" @bind-Value="ImageMapToAdd.Title"/>
+         <ValidationMessage For="@(() => ImageMapToAdd.Title)" />
+         <br />
+         <label class="form-label" for="description">Descrizione:</label>
+         <InputText id="description" @bind-Value="ImageMapToAdd.DetailedDescription"/>
+         <ValidationMessage For="@(() => ImageMapToAdd.DetailedDescription)" />
+         <br />
+         <button class="btn-primary" type="submit">Aggiungi Descrizione</button>
+    </EditForm>
+</div>
+
+@*
+    <button class="btn-primary">Area Rettangolare</button>
+    <br /> <br />
+    <button class="btn-primary">Area Circolare</button>
+    <br /> <br />
+    <button class="btn-primary">Area Disegno Libero</button>*@
+
+ 

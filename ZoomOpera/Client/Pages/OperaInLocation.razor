@@ -1,0 +1,44 @@
+﻿@page "/strutture/{FatherBuildingId:guid}/piani/{FatherLevelId:guid}/locazioni-opere/{FatherLocationId:guid}/opera"
+@attribute [Authorize(Roles = "Admin")]
+@inherits OperaInLocationBase
+
+<h3>Opera nella Locazione</h3>
+
+<br>
+<AuthorizeView>
+    <Authorized>
+        <br>
+        @if(this.Opera == null)
+        {
+            <p>Loading...</p>   
+        }
+        else
+        {
+            <div>
+                <img src="@OperaImage.Image" />
+            </div>       
+            <div>
+                <h5>Nome Opera:</h5>
+                <p>@Opera.Name</p>
+            </div>
+            <div>
+                <h5>Nome Autore:</h5>
+                <p>@Opera.AuthorFirstName</p>
+            </div>
+            <div>
+                <h5>Cognome Autore:</h5>
+                <p>@Opera.AuthorLastName</p>
+            </div>
+            <div>
+                <h5>Descrizione:</h5>
+                <p>@Opera.ItalianDescription</p>
+            </div>
+            <button class="btn-success" @onclick="AddDetailedDescriptions">Aggiungi descrizioni dettagliate Opera</button>
+            <button class="btn-warning" @onclick="ModifyOpera">Modifica Opera</button>
+            <button class="btn-danger" @onclick="DeleteOpera">Elimina Opera</button>
+        }
+    </Authorized>
+    <NotAuthorized>
+        Not Authorized: try Login
+    </NotAuthorized>
+</AuthorizeView>

@@ -1,0 +1,52 @@
+﻿@page "/strutture"
+@attribute [Authorize(Roles = "Admin")]
+@inherits BuildingsBase
+
+<h2>Strutture</h2>
+<br>
+<AuthorizeView>
+    <Authorized>
+        @*<button class="btn-success" onclick="@GoToAddingBuilding">Aggiungi Struttura</button>*@
+        <AddBuilding BuildingAdded="@HandleOnAddedBuilding"></AddBuilding>
+        <br>
+        @if(this.Buildings.Count == 0)
+        {
+            <p>Loading...</p>    
+        }
+        else
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Codice</th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var building in Buildings)
+                    {
+                        <tr>
+                            <td>@building.Name</td>
+                            <td>@building.BuildingCode</td>
+                            <td>
+                                <button class="btn-link" @onclick="() => GoToLevels(building.Id)">Gestisci Piani</button>
+                            </td>
+                            <td>
+                                <button class="btn-warning" @onclick="() => ModifyBuilding(building.Id)">Modifica</button>
+                            </td>
+                            <td>
+                                <button class="btn-danger" @onclick="() => DeleteBuilding(building.Id)">Elimina</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>        
+        }
+    </Authorized>
+    <NotAuthorized>
+        Not Authorized: try Login
+    </NotAuthorized>
+</AuthorizeView>

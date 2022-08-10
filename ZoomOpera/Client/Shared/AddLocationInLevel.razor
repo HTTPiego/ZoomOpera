@@ -1,0 +1,22 @@
+﻿@page "/strutture/{FatherBuildingId:guid}/piani/{FatherLevelId:guid}/locazioni-opere/aggiungi-locazione"
+@attribute [Authorize(Roles = "Admin")]
+@inherits AddLocationInLevelBase
+
+<h3>Aggiugni Locazione Opera nel Piano</h3>
+
+<div>
+    <EditForm Model="@LocationToAdd" OnSubmit="@AddLocation">
+        <DataAnnotationsValidator />
+         <label class="form-label" for="code">Codice Locazione</label>
+         <br />
+         <InputText id="code" @bind-Value="LocationToAdd.LocationCode"/>
+         <ValidationMessage For="@(() => LocationToAdd.LocationCode)" />
+         <br /> 
+         <label class="form-label" for="notes">Note</label>
+         <br />
+         <InputTextArea id="notes" @bind-Value="LocationToAdd.Notes"/>
+         <ValidationMessage For="@(() => LocationToAdd.Notes)" />
+         <br /> <br />
+         <button class="btn-success" type="submit">Aggiungi Locazione Opera</button>
+    </EditForm>
+</div>

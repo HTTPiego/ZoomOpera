@@ -1,0 +1,32 @@
+﻿@page "/strutture/{FatherBuildingId:guid}/piani/{FatherLevelId:guid}/locazioni-opere/{FatherLocationId:guid}/aggiungi-opera"
+@attribute [Authorize(Roles = "Admin")]
+@inherits AddOperaInLocationBase
+
+<h3>Aggiungi Opera nella Locazione</h3>
+
+<div>
+    <img src="@OperaImageToAdd.Image"/>
+    <EditForm Model="@OperaToAdd" OnSubmit="AddOpera">
+        <DataAnnotationsValidator />
+        <label class="form-label" for="image">Immagine Opera</label> 
+        <InputFile OnChange="OnUploadedOperaImage" id="image"/>
+        <br />
+        <label class="form-label" for="opera">Nome Opera</label> 
+        <InputText id="opera" @bind-Value="OperaToAdd.Name"/>
+        <ValidationMessage For="@(() => OperaToAdd.Name)" />
+        <br />
+        <label class="form-label" for="autore">Nome Autore</label> 
+        <InputText id="autore" @bind-Value="OperaToAdd.AuthorFirstName"/>
+        <ValidationMessage For="@(() => OperaToAdd.AuthorFirstName)" />
+        <br />
+        <label class="form-label" for="cognome">Cognome Autore</label> 
+        <InputText id="cognome" @bind-Value="OperaToAdd.AuthorLastName"/>
+        <ValidationMessage For="@(() => OperaToAdd.AuthorLastName)" />
+        <br />
+        <label class="form-label" for="description">Descrizione Opera</label> 
+        <InputTextArea id="description" @bind-Value="OperaToAdd.ItalianDescription"/>
+        <ValidationMessage For="@(() => OperaToAdd.ItalianDescription)" />
+        <br />
+        <button class="btn-success" type="submit">Aggiugni Opera</button>
+    </EditForm>
+</div>

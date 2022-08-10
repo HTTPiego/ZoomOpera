@@ -1,0 +1,66 @@
+﻿@page "/strutture/{FatherBuildingId:guid}/piani"
+@attribute [Authorize(Roles = "Admin")]
+@inherits LevelsInBuildingBase
+
+<h2>Piani</h2>
+<br>
+<AuthorizeView>
+    <Authorized>
+        <AddLevelInBuilding LevelAdded="@HandleOnAddedLevel" FatherBuildingId="FatherBuildingId"/>
+        <br>
+        @if(this.Levels.Count == 0)
+        {
+            <p>Loading...</p>    
+        }
+        else
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Numero Piano</th>
+                        <th>Stato Planimetria</th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var level in Levels)
+                    {
+                        <tr>
+                            <td>@level.LevelNumber</td>
+                            @if (String.IsNullOrEmpty(@level.Planimetry))
+                            {
+                                <td>
+                                    <p class="text-danger">NON caricata</p>
+                                </td>
+                            }
+                            else
+                            {
+                                <td>
+                                    <p class="text-success">caricata</p>
+                                </td>
+                            }
+                            <td>
+                                <button class="btn-link" @onclick="() => GoToLocations(level.Id)">Gestisci Locazioni Opere</button>
+                            </td>
+                            <td>
+                                <button class="btn-link" @onclick="() => GoToMonitofPLatforms(level.Id)">Gestisci Piattaforme-Monitor</button>
+                            </td>
+                            <td>
+                                <button class="btn-warning" @onclick="() => ModifyLevel(level.Id)">Modifica</button>
+                            </td>
+                            <td>
+                                <button class="btn-danger" @onclick="() => DeleteLevel(level.Id)">Elimina</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>        
+        }
+    </Authorized>
+    <NotAuthorized>
+        Not Authorized: try Login
+    </NotAuthorized>
+</AuthorizeView>
