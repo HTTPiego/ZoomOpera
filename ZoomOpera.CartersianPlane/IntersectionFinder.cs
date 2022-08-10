@@ -4,7 +4,7 @@
     {
         public static CartesianPoint IntesectionBetween(ImplicitFormStraightLine firstLine, ImplicitFormStraightLine secondLine)
         {
-            //TODO: caso x=k oppure y=k
+            //TODO: caso rette parallele e x=k oppure y=k
 
             //Sistema di euqazioni
 
@@ -24,6 +24,7 @@
 
             //sostituisco y nella seconda equazione e trovo x
             var x = ((-secondLine.b * y) / secondLine.a) + (-secondLine.c / secondLine.a);
+
 
             return new CartesianPoint(x, y);
         }

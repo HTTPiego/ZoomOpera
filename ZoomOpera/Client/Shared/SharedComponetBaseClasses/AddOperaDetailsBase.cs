@@ -116,7 +116,7 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
            if(imageMapCoordinates.Count < 2)
                 return false;
             imageMapCoordinates.OrderBy(c => c.Position);
-            List<ImageMapCoordinateDTO[]> listOfCouples = GetCoordinatesCouples(coordinateToAdd);
+            List<ImageMapCoordinateDTO[]> listOfCouples = GetVertexesCouples(coordinateToAdd);
             bool thereIsOverlapping = false;
             for (int i = 0; i < listOfCouples.Count; i++)
             {
@@ -146,7 +146,7 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
         }
 
         //Ottengo tutte le coppie di vertici in cui posso individuare rette
-        private List<ImageMapCoordinateDTO[]> GetCoordinatesCouples(ImageMapCoordinateDTO coordinateToAdd)
+        private List<ImageMapCoordinateDTO[]> GetVertexesCouples(ImageMapCoordinateDTO coordinateToAdd)
         {
             List<ImageMapCoordinateDTO[]> listOfCouples = new List<ImageMapCoordinateDTO[]>();
             var coordinates = imageMapCoordinates.ToArray();
@@ -157,6 +157,7 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
                 {
                     couple[0] = coordinates[i];
                     couple[1] = coordinateToAdd;
+
                     listOfCouples.Add(couple);
                 }
                 else
@@ -196,10 +197,12 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
         {
             ImageMapToAdd.ImageMapShape = SelectedImageMapShape;
             ImageMapToAdd.OperaImageId = OperaImageToDetail.Id;
-            ImageMapToAdd.ImgeMapCoordinates = imageMapCoordinates;
-            if (ImageMapOverlapsWithOthers(ImageMapToAdd))
+            ImageMapToAdd.ImageMapCoordinates = imageMapCoordinates;
+            if (ImageMapToAddOverlapsWithOthers())
             {
                 ShowMessage(ImageMapIsOverlapped);
+                ImageMapToAdd = new ImageMapDTO();
+                imageMapCoordinates.Clear();
                 return;
             }
             await ImageMapService.AddEntity(ImageMapToAdd);
@@ -207,23 +210,349 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
             imageMapCoordinates.Clear();
         }
 
-        private bool ImageMapOverlapsWithOthers(ImageMapDTO imageMapToAdd)
+        private bool ImageMapToAddOverlapsWithOthers()
         {
-            var operaToDetailImageMaps = OperaImageToDetail.ImageMaps;
-            foreach (var imageMap in operaToDetailImageMaps)
+            if (this.ImageMapToAdd.ImageMapShape.Equals(ImageMapShape.Circle))
             {
-                var shape = imageMap.ImageMapShape;
-                if (shape.Equals(ImageMapShape.Circle))
-                {
+                return CircleOverlappingSearch();
+            }
+            else
+            {
+                return PolyRectOverlappingSearch();
+            }
+        }
 
+
+        private bool CircleOverlappingSearch()
+        {
+            var circleToAdd = GetCircleFrom(this.ImageMapToAdd);
+            var operaToDetailImageMaps = OperaImageToDetail.ImageMaps;
+            foreach (ImageMap imageMap in operaToDetailImageMaps)
+            {
+                if (imageMap.ImageMapShape.Equals(ImageMapShape.Circle))
+                {
+                    var intersectionPoints = IntersectionFinder.IntesectionBetween(circleToAdd, GetCircleFrom(imageMap));
+                    if (intersectionPoints.Count != 0)
+                        return true;
                 }
                 else
                 {
-
+                    List<IImageMapCoordinate[]> vertexesCouples;
+                    var straightLinesInImageMapVertexes = GetStraightLinesFrom(imageMap, out vertexesCouples);
+                    for (int i = 0; i < straightLinesInImageMapVertexes.Count; i++)
+                    {
+                        double biggerX;
+                        double smallerX;
+                        AssignBiggerSmallerX(out biggerX, out smallerX, vertexesCouples[i]);
+                        var intersectionPoints = IntersectionFinder.IntesectionBetween(straightLinesInImageMapVertexes[i], 
+                                                                                        circleToAdd);
+                        foreach(var point in intersectionPoints)
+                        {
+                            if (point.X >= smallerX && point.X <= biggerX)
+                                return true;
+                        }
+                    }
                 }
             }
+            return false;
+        }
 
-            return true;
+        private void AssignBiggerSmallerX(out double biggerX, 
+                                            out double smallerX, 
+                                            IImageMapCoordinate[] imageMapCoordinates)
+        {
+            var firstVertex = imageMapCoordinates[0];
+            var secondVertex = imageMapCoordinates[1];
+
+            if (firstVertex.X >= secondVertex.X)
+            {
+                biggerX = firstVertex.X;
+                smallerX = secondVertex.X;
+            }
+            else
+            {
+                biggerX = secondVertex.X;
+                smallerX = firstVertex.X;
+            }
+
+        }
+
+        private bool PolyRectOverlappingSearch()
+        {
+            var operaToDetailImageMaps = OperaImageToDetail.ImageMaps;
+
+            List<ImageMapCoordinateDTO[]> vertexesCouples;
+            var linesInImageMapToAdd = GetStraightLinesFrom(this.ImageMapToAdd, out vertexesCouples);
+
+            for (int i = 0; i < linesInImageMapToAdd.Count; i++)
+            {
+                double biggerX;
+                double smallerX;
+                AssignBiggerSmallerX(out biggerX, out smallerX, vertexesCouples[i]);
+                foreach (ImageMap imageMap in operaToDetailImageMaps)
+                {
+                    if (imageMap.ImageMapShape.Equals(ImageMapShape.Circle))
+                    {
+                        var intersectionPoints = IntersectionFinder.IntesectionBetween(linesInImageMapToAdd[i], 
+                                                                                        GetCircleFrom(imageMap));
+                        foreach (var point in intersectionPoints)
+                        {
+                            if (point.X >= smallerX && point.X <= biggerX)
+                                return true;
+                        }
+                    }
+                    else
+                    {
+                        var linesInDBImageMap = GetStraightLinesFrom(imageMap);
+                        foreach(var lineDBImageMap in linesInDBImageMap)
+                        {
+                            var intersectionPoint = IntersectionFinder.IntesectionBetween(linesInImageMapToAdd[i],
+                                                                                            lineDBImageMap);
+                            if (intersectionPoint.X >= smallerX && intersectionPoint.X <= biggerX)
+                                return true;
+                        }
+                    }
+                }
+
+            }
+
+            return false;
+        }
+
+        private void AssignBiggerSmallerX(out double biggerX,
+                                            out double smallerX,
+                                            ImageMapCoordinateDTO[] imageMapCoordinates)
+        {
+            var firstVertex = imageMapCoordinates[0];
+            var secondVertex = imageMapCoordinates[1];
+
+            if (firstVertex.X >= secondVertex.X)
+            {
+                biggerX = firstVertex.X;
+                smallerX = secondVertex.X;
+            }
+            else
+            {
+                biggerX = secondVertex.X;
+                smallerX = firstVertex.X;
+            }
+
+        }
+
+
+
+        private ImplicitFormcCircumference GetCircleFrom(IImageMap imageMap)
+        {
+            ICollection<ImageMapCoordinate> coordinates = imageMap.ImageMapCoordinates;
+            coordinates.OrderBy(c => c.Position);
+            var center = coordinates.First();
+            var circumferencePoint = coordinates.Last();
+            var circle = CircumferenceFinder.FindWith(new CartesianPoint(center.X, center.Y),
+                                                        new CartesianPoint(circumferencePoint.X, circumferencePoint.Y));
+            return circle;
+        }
+        
+
+        private List<ImplicitFormStraightLine> GetStraightLinesFrom(IImageMap imageMap, 
+                                                                    out List<IImageMapCoordinate[]> vertexesCouples)
+        {
+            List<ImplicitFormStraightLine> straightLines = new List<ImplicitFormStraightLine>();
+
+            //List<IImageMapCoordinate[]> vertexesCouples;
+
+            ICollection<ImageMapCoordinate> vertexes = imageMap.ImageMapCoordinates;
+            vertexes.OrderBy(c => c.Position);
+            if (imageMap.ImageMapShape.Equals(ImageMapShape.Rect))
+            {
+                vertexesCouples = GetVertexesCouples(AddTwoMissingVertexesToRect(vertexes));
+            }
+            else
+            {
+                vertexesCouples = GetVertexesCouples(vertexes);
+            }
+
+            foreach(var couple in vertexesCouples)
+            {
+                var straightLine = StraightLineInTwoPointFinder
+                                    .FindStraightLine(new CartesianPoint(couple[0].X, couple[0].Y),
+                                                        new CartesianPoint(couple[1].X, couple[1].Y));
+                straightLines.Add(straightLine);
+            }
+
+            return straightLines;
+
+        }
+
+        private List<ImplicitFormStraightLine> GetStraightLinesFrom(IImageMap imageMap)
+        {
+            List<ImplicitFormStraightLine> straightLines = new List<ImplicitFormStraightLine>();
+
+            List<IImageMapCoordinate[]> vertexesCouples;
+
+            ICollection<ImageMapCoordinate> vertexes = imageMap.ImageMapCoordinates;
+            vertexes.OrderBy(c => c.Position);
+            if (imageMap.ImageMapShape.Equals(ImageMapShape.Rect))
+            {
+                vertexesCouples = GetVertexesCouples(AddTwoMissingVertexesToRect(vertexes));
+            }
+            else
+            {
+                vertexesCouples = GetVertexesCouples(vertexes);
+            }
+
+            foreach (var couple in vertexesCouples)
+            {
+                var straightLine = StraightLineInTwoPointFinder
+                                    .FindStraightLine(new CartesianPoint(couple[0].X, couple[0].Y),
+                                                        new CartesianPoint(couple[1].X, couple[1].Y));
+                straightLines.Add(straightLine);
+            }
+
+            return straightLines;
+
+        }
+
+        private ICollection<ImageMapCoordinate> AddTwoMissingVertexesToRect(ICollection<ImageMapCoordinate> rectVertexes)
+        {
+            ICollection<ImageMapCoordinate> vertexes = new LinkedList<ImageMapCoordinate>();
+
+            var firstVertex = rectVertexes.First();
+            firstVertex.Position = 1;
+            var oppositeVertex = rectVertexes.Last();
+            oppositeVertex.Position = 3;
+
+            var fistMissingVertex = new ImageMapCoordinate(oppositeVertex.X, firstVertex.Y);
+            fistMissingVertex.Position = 2;
+            var secondMissingVertex = new ImageMapCoordinate(firstVertex.X, oppositeVertex.Y);
+            secondMissingVertex.Position = 4;
+
+            vertexes.Append(firstVertex);
+            vertexes.Append(fistMissingVertex);
+            vertexes.Append(oppositeVertex);
+            vertexes.Append(secondMissingVertex);
+
+            return vertexes;
+        }
+
+        private List<IImageMapCoordinate[]> GetVertexesCouples(ICollection<ImageMapCoordinate> imageMapsCoordinates)
+        {
+            List<IImageMapCoordinate[]> listOfCouples = new List<IImageMapCoordinate[]>();
+
+            var coordinates = imageMapsCoordinates.ToArray();
+            for (int i = 0; i < coordinates.Length; i++)
+            {
+                IImageMapCoordinate[] couple = new IImageMapCoordinate[2];
+                if (i == coordinates.Length - 1)
+                {
+                    couple[0] = coordinates[i];
+                    couple[1] = coordinates[0];
+
+                    listOfCouples.Add(couple);
+                }
+                else
+                {
+                    couple[0] = coordinates[i];
+                    couple[1] = coordinates[i + 1];
+
+                    listOfCouples.Add(couple);
+                }
+            }
+            return listOfCouples;
+        }
+
+
+
+
+        private ImplicitFormcCircumference GetCircleFrom(ImageMapDTO imageMapToAdd)
+        {
+            LinkedList<ImageMapCoordinateDTO> coordinates = imageMapToAdd.ImageMapCoordinates;
+            coordinates.OrderBy(c => c.Position);
+            var center = coordinates.First();
+            var circumferencePoint = coordinates.Last();
+            var circle = CircumferenceFinder.FindWith(new CartesianPoint(center.X, center.Y),
+                                                        new CartesianPoint(circumferencePoint.X, circumferencePoint.Y));
+            return circle;
+        }
+
+        private List<ImplicitFormStraightLine> GetStraightLinesFrom(ImageMapDTO imageMapToAdd, 
+                                                                    out List<ImageMapCoordinateDTO[]> vertexesCouples)
+        {
+            List<ImplicitFormStraightLine> straightLines = new List<ImplicitFormStraightLine>();
+
+            //List<ImageMapCoordinateDTO[]> vertexesCouples;
+
+            LinkedList<ImageMapCoordinateDTO> vertexes = imageMapToAdd.ImageMapCoordinates;
+            vertexes.OrderBy(c => c.Position);
+            if (imageMapToAdd.ImageMapShape.Equals(ImageMapShape.Rect))
+            {
+                vertexesCouples = GetVertexesCouples(AddTwoMissingVertexesToRect(vertexes));
+            }
+            else
+            {
+                vertexesCouples = GetVertexesCouples(vertexes);
+            }
+
+            foreach (var couple in vertexesCouples)
+            {
+                var straightLine = StraightLineInTwoPointFinder
+                                    .FindStraightLine(new CartesianPoint(couple[0].X, couple[0].Y),
+                                                        new CartesianPoint(couple[1].X, couple[1].Y));
+                straightLines.Add(straightLine);
+            }
+
+            return straightLines;
+
+        }
+
+
+        private LinkedList<ImageMapCoordinateDTO> AddTwoMissingVertexesToRect(LinkedList<ImageMapCoordinateDTO> rectVertexes)
+        {
+            LinkedList<ImageMapCoordinateDTO> vertexes = new LinkedList<ImageMapCoordinateDTO>();
+
+            var firstVertex = rectVertexes.First();
+            firstVertex.Position = 1;
+            var oppositeVertex = rectVertexes.Last();
+            oppositeVertex.Position = 3;
+
+            var fistMissingVertex = new ImageMapCoordinateDTO(oppositeVertex.X, firstVertex.Y);
+            fistMissingVertex.Position = 2;
+            var secondMissingVertex = new ImageMapCoordinateDTO(firstVertex.X, oppositeVertex.Y);
+            secondMissingVertex.Position = 4;
+
+            vertexes.AddLast(firstVertex);
+            vertexes.AddLast(fistMissingVertex);
+            vertexes.AddLast(oppositeVertex);
+            vertexes.AddLast(secondMissingVertex);
+
+            return vertexes;
+        }
+
+
+
+        private List<ImageMapCoordinateDTO[]> GetVertexesCouples(LinkedList<ImageMapCoordinateDTO> imageMapsCoordinates)
+        {
+            List<ImageMapCoordinateDTO[]> listOfCouples = new List<ImageMapCoordinateDTO[]>();
+
+            var coordinates = imageMapsCoordinates.ToArray();
+            for (int i = 0; i < coordinates.Length; i++)
+            {
+                ImageMapCoordinateDTO[] couple = new ImageMapCoordinateDTO[2];
+                if (i == coordinates.Length - 1)
+                {
+                    couple[0] = coordinates[i];
+                    couple[1] = coordinates[0];
+
+                    listOfCouples.Add(couple);
+                }
+                else
+                {
+                    couple[0] = coordinates[i];
+                    couple[1] = coordinates[i + 1];
+
+                    listOfCouples.Add(couple);
+                }
+            }
+            return listOfCouples;
         }
 
         protected override async Task OnInitializedAsync()

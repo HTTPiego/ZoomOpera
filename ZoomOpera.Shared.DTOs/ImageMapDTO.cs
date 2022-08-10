@@ -14,7 +14,7 @@ namespace ZoomOpera.DTOs
         public ImageMapShape ImageMapShape { get; set; }
         public Guid OperaImageId { get; set; }
 
-        public LinkedList<ImageMapCoordinateDTO> ImgeMapCoordinates { get; set; }  
+        public LinkedList<ImageMapCoordinateDTO> ImageMapCoordinates { get; set; }  
 
         public ImageMapDTO() { }
 

@@ -87,7 +87,7 @@ namespace ZoomOpera.Server.Controllers
 
                 var addedImageMap = await _imageMapService.AddEntity(dto);
 
-                dto.ImgeMapCoordinates.AsParallel().ForAll(c => 
+                dto.ImageMapCoordinates.AsParallel().ForAll(c => 
                                                     { c.ImageMapId = addedImageMap.Id; 
                                                       _coordinatesService.AddEntity(c); });
 
@@ -107,7 +107,7 @@ namespace ZoomOpera.Server.Controllers
             if (!Enum.IsDefined(dto.ImageMapShape)
                 || dto.Title == null
                 || dto.DetailedDescription == null
-                || dto.ImgeMapCoordinates == null)
+                || dto.ImageMapCoordinates == null)
                 return true;
             return false;
         }

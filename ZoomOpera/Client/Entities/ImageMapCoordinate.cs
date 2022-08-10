@@ -12,6 +12,12 @@ namespace ZoomOpera.Client.Entities
         public virtual ImageMap ImageMap { get; set; }
         public Guid ImageMapId { get; set; }
 
+        public ImageMapCoordinate(double x, double y)
+        {
+            X = x;
+            Y = y;
+        }
+
         public override bool Equals(object? obj)
         {
             return obj is ImageMapCoordinate coordinate &&
