@@ -71,6 +71,16 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
             message.ShowMessage = false;
         }
 
+        //public double X { get; set; }
+
+        //public double Y { get; set; }
+
+        //public void verifica(MouseEventArgs e)
+        //{
+        //    X = e.ClientX;
+        //    Y = e.ClientY;
+        //}
+
         public void AddImageMapCoordinate(MouseEventArgs e)
         {
             var imageMapCoordinte = new ImageMapCoordinateDTO(e.ClientX, e.ClientY);
@@ -90,7 +100,7 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
                 {
                     var firstCoordinate = imageMapCoordinates.First();
                     if (imageMapCoordinte.X == firstCoordinate.X
-                        || imageMapCoordinte.Y == firstCoordinate.Y)
+                        || imageMapCoordinte.Y == firstCoordinate.Y) //altrimenti esce un segmento
                     {
                         ShowMessage(NotValidCoordinate);
                         return;
@@ -117,19 +127,14 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
                 return false;
             imageMapCoordinates.OrderBy(c => c.Position);
             List<ImageMapCoordinateDTO[]> listOfCouples = GetVertexesCouples(coordinateToAdd);
-            bool thereIsOverlapping = false;
             for (int i = 0; i < listOfCouples.Count; i++)
             {
-                if (thereIsOverlapping)
-                    break;
                 var coupleToCheck = listOfCouples[i];
                 var straightLineInCouple = StraightLineInTwoPointFinder
                                             .FindStraightLine(new CartesianPoint(coupleToCheck[0].X, coupleToCheck[0].Y),
                                                                 new CartesianPoint(coupleToCheck[1].X, coupleToCheck[1].Y));
                 for (int j = 0; j < listOfCouples.Count; j++)
                 {
-                    if (thereIsOverlapping)
-                        break;
                     if (i == j)
                         continue;
                     var coupleOfHypotheticalIntersection = listOfCouples[j];    
@@ -139,10 +144,10 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
                     var intersectionPoint = IntersectionFinder
                                             .IntesectionBetween(straightLineInCouple, straightLineInIntersectionCouple);
                     if (IntersectionPointIsNotValid(intersectionPoint, coupleOfHypotheticalIntersection))
-                        thereIsOverlapping = true;
+                        return true;
                 }
             }
-            return thereIsOverlapping;
+            return false;
         }
 
         //Ottengo tutte le coppie di vertici in cui posso individuare rette
@@ -164,6 +169,7 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
                 {
                     couple[0] = coordinates[i];
                     couple[1] = coordinates[i + 1];
+
                     listOfCouples.Add(couple);
                 }
             }
@@ -198,14 +204,14 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
             ImageMapToAdd.ImageMapShape = SelectedImageMapShape;
             ImageMapToAdd.OperaImageId = OperaImageToDetail.Id;
             ImageMapToAdd.ImageMapCoordinates = imageMapCoordinates;
-            if (ImageMapToAddOverlapsWithOthers())
+            if ( ! ImageMapToAddOverlapsWithOthers() ) // se l'image map e' valido
+            {
+                await ImageMapService.AddEntity(ImageMapToAdd);
+            }
+            else
             {
                 ShowMessage(ImageMapIsOverlapped);
-                ImageMapToAdd = new ImageMapDTO();
-                imageMapCoordinates.Clear();
-                return;
             }
-            await ImageMapService.AddEntity(ImageMapToAdd);
             ImageMapToAdd = new ImageMapDTO();
             imageMapCoordinates.Clear();
         }

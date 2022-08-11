@@ -4,7 +4,7 @@
     {
         public static CartesianPoint IntesectionBetween(ImplicitFormStraightLine firstLine, ImplicitFormStraightLine secondLine)
         {
-            //TODO: caso rette parallele e x=k oppure y=k
+            //TODO: caso rette parallele 
 
             //Sistema di euqazioni
 
@@ -98,14 +98,16 @@
             var substitution = -line.b * firstY;
             var denominatorSubstitution = line.a * denominatorFirstY;
             var leastCommonMultiple = LCM(denominatorSubstitution, line.a);
-            var firstX = (substitution * (leastCommonMultiple / denominatorSubstitution) + (-line.c * (leastCommonMultiple / line.a))) / leastCommonMultiple;
+            var firstX = (substitution * (leastCommonMultiple / denominatorSubstitution) + (-line.c * (leastCommonMultiple / line.a))) 
+                                                                            / leastCommonMultiple;
 
             result.AddLast(new CartesianPoint(firstX, firstY/denominatorFirstY));
             
             //denominatori uguali
             var secondY = -equation.b - Math.Sqrt(equation.getDelta());
             substitution = -line.b * secondY;
-            var secondX = (substitution * (leastCommonMultiple / denominatorSubstitution) + (-line.c * (leastCommonMultiple / line.a))) / leastCommonMultiple;
+            var secondX = (substitution * (leastCommonMultiple / denominatorSubstitution) + (-line.c * (leastCommonMultiple / line.a))) 
+                                                                                / leastCommonMultiple;
 
             result.AddLast(new CartesianPoint(secondX, secondY/denominatorFirstY));   
         }
@@ -225,15 +227,17 @@
             var denominatorFirstY = 2 * equation.a;
             var substitution = bMinusE * firstY;
             var substitutionDenominator = denominatorFirstY * denominator;
-            var leastCommonMultiple = LCM(substitution, denominator);
-            var firstX = (substitution * (leastCommonMultiple / substitutionDenominator) + (cMinusF * (leastCommonMultiple / denominator))) / leastCommonMultiple;
+            var leastCommonMultiple = LCM(substitutionDenominator, denominator);
+            var firstX = (substitution * (leastCommonMultiple / substitutionDenominator) + (cMinusF * (leastCommonMultiple / denominator))) 
+                                                                                / leastCommonMultiple;
 
             result.AddLast(new CartesianPoint(firstX, firstY / denominatorFirstY));
 
             //denominatori uguali
             var secondY = -equation.b + Math.Sqrt(equation.getDelta());
             substitution = bMinusE * secondY;
-            var secondX = (substitution * (leastCommonMultiple / substitutionDenominator) + (cMinusF * (leastCommonMultiple / denominator))) / leastCommonMultiple;
+            var secondX = (substitution * (leastCommonMultiple / substitutionDenominator) + (cMinusF * (leastCommonMultiple / denominator))) 
+                                                                                / leastCommonMultiple;
 
             result.AddLast(new CartesianPoint(secondX, secondY/denominatorFirstY));
         }   
