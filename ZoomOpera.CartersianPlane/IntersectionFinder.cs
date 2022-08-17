@@ -11,7 +11,7 @@
             //trovo x da seconda equazione ax = -by -c
             //   x = (-b/a)y + (-c/a) 
             //sostituisco la x nella prima equazione
-            // a(-secondLine.b / secondLine.a) + (-secondLine.c / secondLine.a)) + by + c = 0;
+            // a((-secondLine.b / secondLine.a)y + (-secondLine.c / secondLine.a)) + by + c = 0;
             var b1 = -secondLine.b * firstLine.a;
             var c1 = -secondLine.c * firstLine.a;
 

@@ -13,5 +13,13 @@
             this.b = b;
             this.c = c;
         }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ImplicitFormStraightLine line &&
+                   a == line.a &&
+                   b == line.b &&
+                   c == line.c;
+        }
     }
 }

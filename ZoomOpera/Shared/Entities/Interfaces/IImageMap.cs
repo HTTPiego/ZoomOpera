@@ -9,7 +9,7 @@ namespace ZoomOpera.Shared.Entities.Interfaces
         string Name { get; set; }
 
         string DetailedDescription { get; set; }
-        ImageMapShape ImageMapShape { get; init; }
+        string ImageMapShape { get; init; }
         OperaImage OperaImage { get; set; }
         Guid OperaImageId { get; set; }
         ICollection<ImageMapCoordinate> ImageMapCoordinates { get; set; }

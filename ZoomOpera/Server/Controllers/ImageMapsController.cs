@@ -104,7 +104,7 @@ namespace ZoomOpera.Server.Controllers
         {
             if (dto == null)
                 return true;
-            if (!Enum.IsDefined(dto.ImageMapShape)
+            if (dto.ImageMapShape == null
                 || dto.Title == null
                 || dto.DetailedDescription == null
                 || dto.ImageMapCoordinates == null)

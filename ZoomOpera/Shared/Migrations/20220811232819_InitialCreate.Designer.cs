@@ -12,7 +12,7 @@ using ZoomOpera.Server.Data;
 namespace ZoomOpera.Shared.Migrations
 {
     [DbContext(typeof(ZoomOperaContext))]
-    [Migration("20220805121136_InitialCreate")]
+    [Migration("20220811232819_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -38,7 +38,7 @@ namespace ZoomOpera.Shared.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Title")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -65,7 +65,7 @@ namespace ZoomOpera.Shared.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Title")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -84,10 +84,11 @@ namespace ZoomOpera.Shared.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ImageMapShape")
-                        .HasColumnType("int");
+                    b.Property<string>("ImageMapShape")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Title")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -110,11 +111,14 @@ namespace ZoomOpera.Shared.Migrations
                     b.Property<Guid>("ImageMapId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("X")
+                    b.Property<int>("Position")
                         .HasColumnType("int");
 
-                    b.Property<int>("Y")
-                        .HasColumnType("int");
+                    b.Property<double>("X")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Y")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
@@ -183,7 +187,7 @@ namespace ZoomOpera.Shared.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Title")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -218,7 +222,7 @@ namespace ZoomOpera.Shared.Migrations
                     b.Property<Guid>("LocationId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Title")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

@@ -6,7 +6,7 @@ namespace ZoomOpera.Client.Entities
     public class ImageMap : IImageMap
     {
         public Guid Id { get; set; }
-        public ImageMapShape ImageMapShape { get; init; }
+        public string ImageMapShape { get; init; }
 
         public virtual OperaImage OperaImage { get; set; }
         public Guid OperaImageId { get; set; }

@@ -11,7 +11,7 @@ namespace ZoomOpera.DTOs
         public string DetailedDescription { get; set; }
 
         [Required]
-        public ImageMapShape ImageMapShape { get; set; }
+        public string ImageMapShape { get; set; }
         public Guid OperaImageId { get; set; }
 
         public LinkedList<ImageMapCoordinateDTO> ImageMapCoordinates { get; set; }  
@@ -20,7 +20,7 @@ namespace ZoomOpera.DTOs
 
         public ImageMapDTO(string Name,
                             string DetailedDescription, 
-                            ImageMapShape ImageMapShape)
+                            string ImageMapShape)
         {
             this.Title = Name;
             this.DetailedDescription = DetailedDescription;

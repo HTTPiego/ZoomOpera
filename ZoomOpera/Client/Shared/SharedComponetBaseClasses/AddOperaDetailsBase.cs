@@ -36,7 +36,9 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
 
         public IOperaImage OperaImageToDetail { get; set; } = new OperaImage();
 
-        public ImageMapShape SelectedImageMapShape { get; set; }
+        public IEnumerable<IImageMap> OperaImageToDetailImageMaps { get; set; } = new List<IImageMap>();
+
+        public string SelectedImageMapShape { get; set; } = ImageMapShape.Poly.ToString();
 
         public ImageMapShape[] ImageMapShapes = (ImageMapShape[])Enum.GetValues(typeof(ImageMapShape));
 
@@ -51,7 +53,7 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
 
         public void ManageShapeSelection(ChangeEventArgs e)
         {
-            SelectedImageMapShape = (ImageMapShape)Enum.Parse(typeof(ImageMapShape), e.Value.ToString());
+            SelectedImageMapShape = e.Value.ToString();
             if (imageMapCoordinates.Count != 0)
                 imageMapCoordinates.Clear();
         }
@@ -71,9 +73,11 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
             message.ShowMessage = false;
         }
 
-        //public double X { get; set; }
+        public double X { get; set; }
 
-        //public double Y { get; set; }
+        public double Y { get; set; }
+
+        public int Counter { get; set; } = 0;
 
         //public void verifica(MouseEventArgs e)
         //{
@@ -83,78 +87,217 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
 
         public void AddImageMapCoordinate(MouseEventArgs e)
         {
-            var imageMapCoordinte = new ImageMapCoordinateDTO(e.ClientX, e.ClientY);
-            if (imageMapCoordinates.Contains(imageMapCoordinte))
+            X = e.ClientX;
+            Y = e.ClientY;
+            Counter++;
+            var imageMapCoordinate = new ImageMapCoordinateDTO(e.ClientX, e.ClientY);
+            if (imageMapCoordinates.Contains(imageMapCoordinate))
             {
                 ShowMessage(NotValidCoordinate);
                 return;
             }
-            if ( !SelectedImageMapShape.Equals(ImageMapShape.Poly) ) //Circle or Rect
+            if (!SelectedImageMapShape.Equals(ImageMapShape.Poly.ToString())) //Circle or Rect
             {
                 if (imageMapCoordinates.Count == 2)
                 {
                     ShowMessage(MaxNumberOfCoordinates);
                     return;
                 }
-                if (SelectedImageMapShape.Equals(ImageMapShape.Rect))
+                if (SelectedImageMapShape.Equals(ImageMapShape.Rect) && imageMapCoordinates.Count != 0)
                 {
                     var firstCoordinate = imageMapCoordinates.First();
-                    if (imageMapCoordinte.X == firstCoordinate.X
-                        || imageMapCoordinte.Y == firstCoordinate.Y) //altrimenti esce un segmento
+                    if (imageMapCoordinate.X == firstCoordinate.X
+                        || imageMapCoordinate.Y == firstCoordinate.Y) //altrimenti esce un segmento
                     {
                         ShowMessage(NotValidCoordinate);
                         return;
                     }
                 }
-                imageMapCoordinte.Position = imageMapCoordinates.Count + 1;
-                imageMapCoordinates.AddLast(imageMapCoordinte);
+                imageMapCoordinate.Position = imageMapCoordinates.Count + 1;
+                Console.WriteLine("coordinata aggiunta");   
+                imageMapCoordinates.AddLast(imageMapCoordinate);
             }
             else //Poly
             {
-                if (ThereIsOverlappingInPoly(imageMapCoordinte))
+                if (ThereIsOverlappingInPoly(imageMapCoordinate))
                 {
+                    Console.WriteLine("overlap");
                     ShowMessage(NotValidCoordinate);
                     return;
                 }
-                imageMapCoordinte.Position = imageMapCoordinates.Count + 1;
-                imageMapCoordinates.AddLast(imageMapCoordinte);
+                imageMapCoordinate.Position = imageMapCoordinates.Count + 1;
+                Console.WriteLine("coordinata aggiunta -> x: " + imageMapCoordinate.X + "; y: " + imageMapCoordinate.Y);
+                imageMapCoordinates.AddLast(imageMapCoordinate);
             }
         }
 
+
+
         private bool ThereIsOverlappingInPoly(ImageMapCoordinateDTO coordinateToAdd)
         {
-           if(imageMapCoordinates.Count < 2)
+            if (imageMapCoordinates.Count < 2)
                 return false;
+
+            if (imageMapCoordinates.Count == 2)
+            {
+                ThirdPointCase(coordinateToAdd);    
+                return false;
+            }
+
             imageMapCoordinates.OrderBy(c => c.Position);
             List<ImageMapCoordinateDTO[]> listOfCouples = GetVertexesCouples(coordinateToAdd);
-            for (int i = 0; i < listOfCouples.Count; i++)
+            
+            //var secondLastCouple = listOfCouples[listOfCouples.Count - 2];
+            //Console.WriteLine("Penultima Coppia -> " + "Prima coordinata - X=" + secondLastCouple[0].X + ", Y=" + secondLastCouple[0].Y + " - Seconda Coordinata: - X=" + secondLastCouple[1].X + ", Y=" + secondLastCouple[1].Y);
+            //var secondLastLine = StraightLineInTwoPointFinder
+            //                        .FindStraightLine(new CartesianPoint(secondLastCouple[0].X, secondLastCouple[0].Y),
+            //                                            new CartesianPoint(secondLastCouple[1].X, secondLastCouple[1].Y));
+            //Console.WriteLine("Retta penultima coppia -> " + "a:" + secondLastLine.a + " b:" + secondLastLine.b + " c:" + secondLastLine.c);
+
+
+            //var lastCouple = listOfCouples[listOfCouples.Count - 1];
+            //Console.WriteLine("Ultima Coppia -> " + "Prima coordinata - X=" + lastCouple[0].X + ", Y=" + lastCouple[0].Y + " - Seconda Coordinata: - X=" + lastCouple[1].X + ", Y=" + lastCouple[1].Y);
+            //var lastLine = StraightLineInTwoPointFinder
+            //                .FindStraightLine(new CartesianPoint(lastCouple[0].X, lastCouple[0].Y),
+            //                                    new CartesianPoint(lastCouple[1].X, lastCouple[1].Y));
+            //Console.WriteLine("Retta ultima coppia -> " + "a:" + lastLine.a + " b:" + lastLine.b + " c:" + lastLine.c);
+
+
+            for (int i = 0; i < listOfCouples.Count - 2; i++)
             {
-                var coupleToCheck = listOfCouples[i];
-                var straightLineInCouple = StraightLineInTwoPointFinder
-                                            .FindStraightLine(new CartesianPoint(coupleToCheck[0].X, coupleToCheck[0].Y),
-                                                                new CartesianPoint(coupleToCheck[1].X, coupleToCheck[1].Y));
-                for (int j = 0; j < listOfCouples.Count; j++)
+                var intersectionCouple = listOfCouples[i];
+                Console.WriteLine("Coppia intersezione -> " + "Prima coordinata - X=" + intersectionCouple[0].X + ", Y=" + intersectionCouple[0].Y + " - Seconda Coordinata: - X=" + intersectionCouple[1].X + ", Y=" + intersectionCouple[1].Y);
+                var lineInIntersectionCouple = StraightLineInTwoPointFinder
+                                                .FindStraightLine(new CartesianPoint(intersectionCouple[0].X, intersectionCouple[0].Y),
+                                                                    new CartesianPoint(intersectionCouple[1].X, intersectionCouple[1].Y));
+                Console.WriteLine("Retta coppia intersezione -> " + "a:" + lineInIntersectionCouple.a + " b:" + lineInIntersectionCouple.b + " c:" + lineInIntersectionCouple.c);
+
+                if (i == 0) //primo cliclo
                 {
-                    if (i == j)
-                        continue;
-                    var coupleOfHypotheticalIntersection = listOfCouples[j];    
-                    var straightLineInIntersectionCouple = StraightLineInTwoPointFinder
-                                            .FindStraightLine(new CartesianPoint(coupleOfHypotheticalIntersection[0].X, coupleOfHypotheticalIntersection[0].Y),
-                                                                new CartesianPoint(coupleOfHypotheticalIntersection[1].X, coupleOfHypotheticalIntersection[1].Y));
+                    Console.WriteLine("caso primo giro");
+
+                    var secondLastCouple = listOfCouples[listOfCouples.Count - 2];
+                    Console.WriteLine("Penultima Coppia -> " + "Prima coordinata - X=" + secondLastCouple[0].X + ", Y=" + secondLastCouple[0].Y + " - Seconda Coordinata: - X=" + secondLastCouple[1].X + ", Y=" + secondLastCouple[1].Y);
+                    var secondLastLine = StraightLineInTwoPointFinder
+                                            .FindStraightLine(new CartesianPoint(secondLastCouple[0].X, secondLastCouple[0].Y),
+                                                                new CartesianPoint(secondLastCouple[1].X, secondLastCouple[1].Y));
+                    Console.WriteLine("Retta penultima coppia -> " + "a:" + secondLastLine.a + " b:" + secondLastLine.b + " c:" + secondLastLine.c);
+
                     var intersectionPoint = IntersectionFinder
-                                            .IntesectionBetween(straightLineInCouple, straightLineInIntersectionCouple);
-                    if (IntersectionPointIsNotValid(intersectionPoint, coupleOfHypotheticalIntersection))
+                                                .IntesectionBetween(secondLastLine, lineInIntersectionCouple);
+                    Console.WriteLine("Punto intersezione ->" + "X=" + intersectionPoint.X + ", Y=" + intersectionPoint.Y );
+                    //Console.WriteLine("numero lista coppie=" + listOfCouples.Count);
+                    if (IntersectionPointIsNotValid(intersectionPoint, intersectionCouple))
                         return true;
                 }
+                else if (i == listOfCouples.Count - 3) //ultimo ciclo
+                {
+                    Console.WriteLine("caso ultimo giro");
+
+                    var lastCouple = listOfCouples[listOfCouples.Count - 1];
+                    Console.WriteLine("Ultima Coppia -> " + "Prima coordinata - X=" + lastCouple[0].X + ", Y=" + lastCouple[0].Y + " - Seconda Coordinata: - X=" + lastCouple[1].X + ", Y=" + lastCouple[1].Y);
+                    var lastLine = StraightLineInTwoPointFinder
+                                    .FindStraightLine(new CartesianPoint(lastCouple[0].X, lastCouple[0].Y),
+                                                        new CartesianPoint(lastCouple[1].X, lastCouple[1].Y));
+                    Console.WriteLine("Retta ultima coppia -> " + "a:" + lastLine.a + " b:" + lastLine.b + " c:" + lastLine.c);
+
+                    var intersectionPoint = IntersectionFinder
+                                               .IntesectionBetween(lastLine, lineInIntersectionCouple);
+                    Console.WriteLine("Punto intersezione ->" + "X=" + intersectionPoint.X + ", Y=" + intersectionPoint.Y);
+                    if (IntersectionPointIsNotValid(intersectionPoint, intersectionCouple))
+                        return true;
+                }
+                else
+                {
+                    Console.WriteLine("altri casi");
+
+                    var lastCouple = listOfCouples[listOfCouples.Count - 1];
+                    Console.WriteLine("Ultima Coppia -> " + "Prima coordinata - X=" + lastCouple[0].X + ", Y=" + lastCouple[0].Y + " - Seconda Coordinata: - X=" + lastCouple[1].X + ", Y=" + lastCouple[1].Y);
+                    var lastLine = StraightLineInTwoPointFinder
+                                    .FindStraightLine(new CartesianPoint(lastCouple[0].X, lastCouple[0].Y),
+                                                        new CartesianPoint(lastCouple[1].X, lastCouple[1].Y));
+                    Console.WriteLine("Retta ultima coppia -> " + "a:" + lastLine.a + " b:" + lastLine.b + " c:" + lastLine.c);
+
+                    var firstIntersectionPoint = IntersectionFinder
+                                                    .IntesectionBetween(lastLine, lineInIntersectionCouple);
+                    Console.WriteLine("Primo Punto intersezione ->" + "X=" + firstIntersectionPoint.X + ", Y=" + firstIntersectionPoint.Y);
+
+                    var secondLastCouple = listOfCouples[listOfCouples.Count - 2];
+                    Console.WriteLine("Penultima Coppia -> " + "Prima coordinata - X=" + secondLastCouple[0].X + ", Y=" + secondLastCouple[0].Y + " - Seconda Coordinata: - X=" + secondLastCouple[1].X + ", Y=" + secondLastCouple[1].Y);
+                    var secondLastLine = StraightLineInTwoPointFinder
+                                            .FindStraightLine(new CartesianPoint(secondLastCouple[0].X, secondLastCouple[0].Y),
+                                                                new CartesianPoint(secondLastCouple[1].X, secondLastCouple[1].Y));
+                    Console.WriteLine("Retta penultima coppia -> " + "a:" + secondLastLine.a + " b:" + secondLastLine.b + " c:" + secondLastLine.c);
+
+                    var secondIntersectionPoint = IntersectionFinder
+                                                    .IntesectionBetween(secondLastLine, lineInIntersectionCouple);
+                    Console.WriteLine("Secondo Punto intersezione ->" + "X=" + secondIntersectionPoint.X + ", Y=" + secondIntersectionPoint.Y);
+                    if (IntersectionPointIsNotValid(firstIntersectionPoint, intersectionCouple)
+                        || IntersectionPointIsNotValid(secondIntersectionPoint, intersectionCouple))
+                        return true;
+                }
+
             }
             return false;
+
         }
+
+        //se il terzo punto con il secondo formano la stessa retta delineata dal primo e secondo punto
+        //elimino il secondo punto
+        private void ThirdPointCase(ImageMapCoordinateDTO coordinateToAdd)
+        {
+            var coords = imageMapCoordinates.OrderBy(c => c.Position);
+            var lineInAlreadyPresentPoints = StraightLineInTwoPointFinder
+                                                .FindStraightLine(new CartesianPoint(coords.First().X, coords.First().Y),
+                                                                    new CartesianPoint(coords.Last().X, coords.Last().Y));
+            var lineInSecondAndNewPoint = StraightLineInTwoPointFinder
+                                            .FindStraightLine(new CartesianPoint(coords.Last().X, coords.Last().Y),
+                                                                new CartesianPoint(coordinateToAdd.X, coordinateToAdd.Y));
+            if (lineInAlreadyPresentPoints.Equals(lineInSecondAndNewPoint))
+                imageMapCoordinates.RemoveLast();
+        }
+
+        //private bool ThereIsOverlappingInPoly(ImageMapCoordinateDTO coordinateToAdd)
+        //{
+        //    if (imageMapCoordinates.Count < 2)
+        //        return false;
+        //    imageMapCoordinates.OrderBy(c => c.Position);
+        //    List<ImageMapCoordinateDTO[]> listOfCouples = GetVertexesCouples(coordinateToAdd);
+        //    //TODO: posso verificare direttamente solo l'ultima coppia
+        //    for (int i = 0; i < listOfCouples.Count; i++)
+        //    {
+        //        var coupleToCheck = listOfCouples[i];
+        //        Console.WriteLine("Coppia controllata -> " + "Prima coordinata - X=" + coupleToCheck[0].X + ", Y=" + coupleToCheck[0].Y + " - Seconda Coordinata: - X=" + coupleToCheck[1].X + ", Y=" + coupleToCheck[1].Y);
+        //        var straightLineInCouple = StraightLineInTwoPointFinder
+        //                                    .FindStraightLine(new CartesianPoint(coupleToCheck[0].X, coupleToCheck[0].Y),
+        //                                                        new CartesianPoint(coupleToCheck[1].X, coupleToCheck[1].Y));
+        //        Console.WriteLine("Retta coppia controllata -> " + "a: " + straightLineInCouple.a + "b: " + straightLineInCouple.b + "c: " + straightLineInCouple.c);
+        //        for (int j = 0; j < listOfCouples.Count; j++)
+        //        {
+        //            if (i == j)
+        //                continue;
+        //            var coupleOfHypotheticalIntersection = listOfCouples[j];
+        //            Console.WriteLine("Coppia intersezione -> " + "Prima coordinata - X=" + coupleOfHypotheticalIntersection[0].X + ", Y=" + coupleOfHypotheticalIntersection[0].Y + " - Seconda Coordinata: - X=" + coupleOfHypotheticalIntersection[1].X + ", Y=" + coupleOfHypotheticalIntersection[1].Y);
+        //            var straightLineInIntersectionCouple = StraightLineInTwoPointFinder
+        //                                    .FindStraightLine(new CartesianPoint(coupleOfHypotheticalIntersection[0].X, coupleOfHypotheticalIntersection[0].Y),
+        //                                                        new CartesianPoint(coupleOfHypotheticalIntersection[1].X, coupleOfHypotheticalIntersection[1].Y));
+        //            Console.WriteLine("Retta coppia intersezione -> " + "a: " + straightLineInIntersectionCouple.a + "b: " + straightLineInIntersectionCouple.b + "c: " + straightLineInIntersectionCouple.c);
+        //            var intersectionPoint = IntersectionFinder
+        //                                    .IntesectionBetween(straightLineInCouple, straightLineInIntersectionCouple);
+        //            Console.WriteLine("Punto intersezione -> " + "X=" + intersectionPoint.X + ", Y=" + intersectionPoint.Y);
+        //            if (IntersectionPointIsNotValid(intersectionPoint, coupleOfHypotheticalIntersection))
+        //                return true;
+        //        }
+        //    }
+        //    return false;
+        //}
 
         //Ottengo tutte le coppie di vertici in cui posso individuare rette
         private List<ImageMapCoordinateDTO[]> GetVertexesCouples(ImageMapCoordinateDTO coordinateToAdd)
         {
             List<ImageMapCoordinateDTO[]> listOfCouples = new List<ImageMapCoordinateDTO[]>();
             var coordinates = imageMapCoordinates.ToArray();
+            coordinates.OrderBy(c => c.Position);
             for (int i = 0; i < coordinates.Length; i++)
             {
                 ImageMapCoordinateDTO[] couple = new ImageMapCoordinateDTO[2];
@@ -162,8 +305,12 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
                 {
                     couple[0] = coordinates[i];
                     couple[1] = coordinateToAdd;
-
                     listOfCouples.Add(couple);
+
+                    ImageMapCoordinateDTO[] lastCouple = new ImageMapCoordinateDTO[2];
+                    lastCouple[0] = coordinateToAdd;
+                    lastCouple[1] = coordinates[0];
+                    listOfCouples.Add(lastCouple);
                 }
                 else
                 {
@@ -212,13 +359,16 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
             {
                 ShowMessage(ImageMapIsOverlapped);
             }
+            OperaImageToDetail = await OperaImageService.GetEntityByfatherRelationshipId(OperaToDetailId);
+            OperaImageToDetailImageMaps = await ImageMapService.GetAllByfatherRelationshipId(OperaImageToDetail.Id);
             ImageMapToAdd = new ImageMapDTO();
             imageMapCoordinates.Clear();
         }
 
         private bool ImageMapToAddOverlapsWithOthers()
         {
-            if (this.ImageMapToAdd.ImageMapShape.Equals(ImageMapShape.Circle))
+            Console.WriteLine("faccio controllo");
+            if (this.ImageMapToAdd.ImageMapShape.Equals("Circle"))
             {
                 return CircleOverlappingSearch();
             }
@@ -226,23 +376,28 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
             {
                 return PolyRectOverlappingSearch();
             }
+            Console.WriteLine("esco");
         }
 
 
         private bool CircleOverlappingSearch()
         {
+            Console.WriteLine("controllo circle overlapping");
             var circleToAdd = GetCircleFrom(this.ImageMapToAdd);
             var operaToDetailImageMaps = OperaImageToDetail.ImageMaps;
-            foreach (ImageMap imageMap in operaToDetailImageMaps)
+            Console.WriteLine("elementi image map " + OperaImageToDetailImageMaps.Count());
+            foreach (ImageMap imageMap in OperaImageToDetailImageMaps)
             {
-                if (imageMap.ImageMapShape.Equals(ImageMapShape.Circle))
+                if (imageMap.ImageMapShape.Equals("Circle"))
                 {
+                    Console.WriteLine("due cerchi");
                     var intersectionPoints = IntersectionFinder.IntesectionBetween(circleToAdd, GetCircleFrom(imageMap));
                     if (intersectionPoints.Count != 0)
                         return true;
                 }
                 else
                 {
+                    Console.WriteLine("cerchio e qualcos'altro");
                     List<IImageMapCoordinate[]> vertexesCouples;
                     var straightLinesInImageMapVertexes = GetStraightLinesFrom(imageMap, out vertexesCouples);
                     for (int i = 0; i < straightLinesInImageMapVertexes.Count; i++)
@@ -566,6 +721,7 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
             ImageMapToAdd = new ImageMapDTO();
             imageMapCoordinates = new LinkedList<ImageMapCoordinateDTO>();
             OperaImageToDetail = await OperaImageService.GetEntityByfatherRelationshipId(OperaToDetailId);
+            OperaImageToDetailImageMaps = await ImageMapService.GetAllByfatherRelationshipId(OperaImageToDetail.Id);
         }
 
 

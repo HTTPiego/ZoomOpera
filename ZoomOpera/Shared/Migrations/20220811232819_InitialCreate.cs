@@ -145,7 +145,7 @@ namespace ZoomOpera.Shared.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ImageMapShape = table.Column<int>(type: "int", nullable: false),
+                    ImageMapShape = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     OperaImageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DetailedDescription = table.Column<string>(type: "nvarchar(max)", nullable: false)
@@ -166,8 +166,9 @@ namespace ZoomOpera.Shared.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    X = table.Column<int>(type: "int", nullable: false),
-                    Y = table.Column<int>(type: "int", nullable: false),
+                    X = table.Column<double>(type: "float", nullable: false),
+                    Y = table.Column<double>(type: "float", nullable: false),
+                    Position = table.Column<int>(type: "int", nullable: false),
                     ImageMapId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>

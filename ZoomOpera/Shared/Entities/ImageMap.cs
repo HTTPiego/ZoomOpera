@@ -10,7 +10,7 @@ namespace ZoomOpera.Shared.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid Id { get; set; }
-        public ImageMapShape ImageMapShape { get; init; }
+        public string ImageMapShape { get; init; }
 
         [Required]
         public virtual OperaImage OperaImage { get; set; }
@@ -22,7 +22,7 @@ namespace ZoomOpera.Shared.Entities
 
         public ImageMap() { }
 
-        public ImageMap(ImageMapShape imageMapShape, 
+        public ImageMap(string imageMapShape, 
                         string name,
                         string description,
                         Guid operaImageId)
