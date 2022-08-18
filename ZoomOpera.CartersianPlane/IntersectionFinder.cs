@@ -183,9 +183,9 @@
             //    ________________________
             //            (a-d)x+(b-e)y+(c-f) 
 
-            //  x = ((b-e)y + (c-f)) / (a-d)
-            var bMinusE = firstCircumference.B - secondCircumference.B;
-            var cMinusF = firstCircumference.C - secondCircumference.C;
+            //  x = (-(b-e)y + -(c-f)) / (a-d)
+            var bMinusE = -(firstCircumference.B - secondCircumference.B);
+            var cMinusF = -(firstCircumference.C - secondCircumference.C);
             var denominator = firstCircumference.A - secondCircumference.A;
 
             //sostituisco nella prima circonferenza
@@ -199,18 +199,22 @@
             var c2 = firstCircumference.A * cMinusF;
 
             //elimino denominatori moltiplicando tuttii membri per squaredDenominator
-            firstCircumference.CoefficientOfSquaredY *= squaredDenominator;
+
+            //firstCircumference.CoefficientOfSquaredY *= squaredDenominator;
+            var squared_y = firstCircumference.CoefficientOfSquaredY * squaredDenominator;
             b2 *= (squaredDenominator / denominator);
             c2 *= (squaredDenominator / denominator);
-            firstCircumference.B *= squaredDenominator;
-            firstCircumference.C *= squaredDenominator;
+            //firstCircumference.B *= squaredDenominator;
+            var b = firstCircumference.B * squaredDenominator;
+            //firstCircumference.C *= squaredDenominator;
+            var c = firstCircumference.C * squaredDenominator;
 
             //equazione
-            var a = firstCircumference.CoefficientOfSquaredY + squared_BminusE;
-            var b = firstCircumference.B + doubleProduct + b2;
-            var c = firstCircumference.C + squared_CminusF + c2;
+            var equation_a = squared_y + squared_BminusE;
+            var equation_b = b + doubleProduct + b2;
+            var equation_c = c + squared_CminusF + c2;
 
-            return new SecondGradeEquation(a, b, c);
+            return new SecondGradeEquation(equation_a, equation_b, equation_c);
         }
 
         private static void deltaGreaterThanZero(ImplicitFormcCircumference firstCircumference,

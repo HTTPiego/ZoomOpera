@@ -376,7 +376,6 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
             {
                 return PolyRectOverlappingSearch();
             }
-            Console.WriteLine("esco");
         }
 
 
@@ -391,9 +390,15 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
                 if (imageMap.ImageMapShape.Equals("Circle"))
                 {
                     Console.WriteLine("due cerchi");
-                    var intersectionPoints = IntersectionFinder.IntesectionBetween(circleToAdd, GetCircleFrom(imageMap));
+                    var circleFromImageMap = GetCircleFrom(imageMap);
+                    var intersectionPoints = IntersectionFinder.IntesectionBetween(circleToAdd, circleFromImageMap);
+                    
                     if (intersectionPoints.Count != 0)
+                    {
+                        Console.WriteLine("overlap 2 circonferenze");
                         return true;
+                    }
+                        
                 }
                 else
                 {
@@ -410,7 +415,11 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
                         foreach(var point in intersectionPoints)
                         {
                             if (point.X >= smallerX && point.X <= biggerX)
+                            {
+                                Console.WriteLine("overlap tra cerchi e rect/poly");
                                 return true;
+                            }
+                                
                         }
                     }
                 }
@@ -505,9 +514,9 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
         private ImplicitFormcCircumference GetCircleFrom(IImageMap imageMap)
         {
             ICollection<ImageMapCoordinate> coordinates = imageMap.ImageMapCoordinates;
-            coordinates.OrderBy(c => c.Position);
-            var center = coordinates.First();
-            var circumferencePoint = coordinates.Last();
+            //coordinates.OrderBy(c => c.Position);
+            var center = coordinates.OrderBy(c => c.Position).First();
+            var circumferencePoint = coordinates.OrderBy(c => c.Position).Last();
             var circle = CircumferenceFinder.FindWith(new CartesianPoint(center.X, center.Y),
                                                         new CartesianPoint(circumferencePoint.X, circumferencePoint.Y));
             return circle;
