@@ -1,5 +1,7 @@
 ﻿namespace ZoomOpera.CartersianPlane
 {
+
+    // x^2 + y^2 + ax + by + c = 0
     public class ImplicitFormcCircumference
     {
         public double CoefficientOfSquaredX { get; set; } 

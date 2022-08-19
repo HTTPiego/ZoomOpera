@@ -29,7 +29,35 @@
             return new CartesianPoint(x, y);
         }
 
-        public static LinkedList<CartesianPoint> IntesectionBetween(ImplicitFormStraightLine line, 
+        //public static LinkedList<CartesianPoint> IntesectionBetween(ImplicitFormStraightLine line,
+        //                                                            ImplicitFormcCircumference circumference)
+        //{
+        //    LinkedList<CartesianPoint> intersectionPoints = new LinkedList<CartesianPoint>();
+
+        //    //dopo aver ricavato la x dalla retta
+        //    //la sostituisco nella circonferenza e ne ottengo
+        //    //un equazione di secondo grado
+        //    var equation = GetEquationFrom(line, circumference);
+
+        //    var delta = equation.getDelta();
+
+        //    //due intersezioni
+        //    if (delta > 0)
+        //    {
+        //        deltaGreaterThanZero(line, equation, intersectionPoints);
+        //        return intersectionPoints;
+        //    }
+        //    //una intersezione
+        //    if (delta == 0)
+        //    {
+        //        deltaIsZero(line, equation, intersectionPoints);
+        //        return intersectionPoints;
+        //    }
+        //    //lista vuota
+        //    return intersectionPoints;
+        //}
+
+        public static LinkedList<CartesianPoint> IntesectionBetween(ImplicitFormStraightLine line,
                                                                     ImplicitFormcCircumference circumference)
         {
             LinkedList<CartesianPoint> intersectionPoints = new LinkedList<CartesianPoint>();
@@ -37,15 +65,145 @@
             if (line.a == 0)
             {
                 HorizontalLineCase(line, circumference, intersectionPoints);
-                return intersectionPoints;
             }
 
-            if (line.b == 0)
+            else if (line.b == 0)
             {
                 VerticalLineCase(line, circumference, intersectionPoints);
-                return intersectionPoints;
             }
 
+            else
+            {
+                AllOtherCases(line, circumference, intersectionPoints);
+            }
+
+            return intersectionPoints;
+        }
+
+
+        private static void HorizontalLineCase(ImplicitFormStraightLine line,
+                                                ImplicitFormcCircumference circumference,
+                                                LinkedList<CartesianPoint> intersectionPoints)
+        {
+            var equation = GetEquationHorizontalCase(line, circumference);
+
+            var delta = equation.getDelta();
+
+
+            if (delta > 0)
+                TwoSolutionsHorizontal(line, equation, intersectionPoints);
+
+            if (delta == 0)
+                OneSolutionHorizontal(line, equation, intersectionPoints);
+
+        }
+
+        private static SecondGradeEquation GetEquationHorizontalCase(ImplicitFormStraightLine line, 
+                                                                        ImplicitFormcCircumference circumference)
+        {
+            //ottengo y da retta
+            var y = -line.c;
+
+            //sostituisco nella equazione della circonferenza 
+
+            var c1 = Math.Pow(y, 2); // --> y^2 --> (-line.c)^2
+            var c2 = circumference.B * y; // --> considerando circonferenza: x^2 + y^2 + ax + by + c = 0 --> by --> b * (-line.c) 
+
+            var equation_a = circumference.CoefficientOfSquaredX;
+            var equation_b = circumference.A;
+            var equation_c = circumference.C + c1 + c2;
+
+            return new SecondGradeEquation(equation_a, equation_b, equation_c);
+        }
+
+        private static void TwoSolutionsHorizontal(ImplicitFormStraightLine line, 
+                                                    SecondGradeEquation equation,
+                                                    LinkedList<CartesianPoint> intersectionPoints)
+        {
+            var firstX = -equation.b - Math.Sqrt(equation.getDelta());
+            var denominatorFirstX = 2 * equation.a;
+            var fistSolution = new CartesianPoint((firstX / denominatorFirstX), -line.c);
+
+            intersectionPoints.AddLast(fistSolution);
+
+            var secondX = -equation.b + Math.Sqrt(equation.getDelta());
+            // denominatore uguale a quello della prima x
+            var secondSolution = new CartesianPoint((secondX / denominatorFirstX), -line.c);
+
+            intersectionPoints.AddLast(secondSolution);
+
+        }
+
+        private static void OneSolutionHorizontal(ImplicitFormStraightLine line,
+                                                    SecondGradeEquation equation,
+                                                    LinkedList<CartesianPoint> intersectionPoints)
+        {
+            intersectionPoints.AddLast(new CartesianPoint((-equation.b / (2 * equation.a)), -line.c));
+        }
+
+
+        private static void VerticalLineCase(ImplicitFormStraightLine line, 
+                                                ImplicitFormcCircumference circumference, 
+                                                LinkedList<CartesianPoint> intersectionPoints)
+        {
+            var equation = GetEquationVerticalCase(line, circumference);
+
+            var delta = equation.getDelta();
+
+
+            if (delta > 0)
+                TwoSolutionsVertical(line, equation, intersectionPoints);
+
+            if (delta == 0)
+                OneSolutionVertical(line, equation, intersectionPoints);
+        }
+
+        
+
+        private static SecondGradeEquation GetEquationVerticalCase(ImplicitFormStraightLine line, 
+                                                                    ImplicitFormcCircumference circumference)
+        {
+            //ottengo y da retta
+            var x = -line.c;    
+
+            //sostituisco nella equazione della circonferenza 
+
+            var c1 = Math.Pow(x, 2); // --> x^2 --> (-line.c)^2
+            var c2 = circumference.A * x; // --> considerando circonferenza: x^2 + y^2 + ax + by + c = 0 --> ax --> a * (-line.c) 
+
+            var equation_a = circumference.CoefficientOfSquaredY;
+            var equation_b = circumference.B;
+            var equation_c = circumference.C + c1 + c2;
+
+            return new SecondGradeEquation(equation_a, equation_b, equation_c);
+        }
+
+        private static void TwoSolutionsVertical(ImplicitFormStraightLine line, 
+                                                    SecondGradeEquation equation, 
+                                                    LinkedList<CartesianPoint> intersectionPoints)
+        {
+            var firstY = -equation.b - Math.Sqrt(equation.getDelta());
+            var denominatorFirstY = 2 * equation.a;
+            var firstSolution = new CartesianPoint(-line.c, (firstY / denominatorFirstY));
+
+            intersectionPoints.AddLast(firstSolution);
+
+            var secondY = -equation.b + Math.Sqrt(equation.getDelta());
+            //denominatore uguale a quello della prima y
+            var secondSolution = new CartesianPoint(-line.c, (secondY / denominatorFirstY));
+
+            intersectionPoints.AddLast(secondSolution);
+        }
+
+        private static void OneSolutionVertical(ImplicitFormStraightLine line, 
+                                                SecondGradeEquation equation, 
+                                                LinkedList<CartesianPoint> intersectionPoints)
+        {
+            intersectionPoints.AddLast(new CartesianPoint(-line.c, (-equation.b / (2 * equation.a))));
+        }
+
+        private static void AllOtherCases(ImplicitFormStraightLine line, ImplicitFormcCircumference circumference, LinkedList<CartesianPoint> intersectionPoints)
+        {
             //dopo aver ricavato la x dalla retta
             //la sostituisco nella circonferenza e ne ottengo
             //un equazione di secondo grado
@@ -57,30 +215,13 @@
             if (delta > 0)
             {
                 deltaGreaterThanZero(line, equation, intersectionPoints);
-                return intersectionPoints;
             }
+
             //una intersezione
             if (delta == 0)
             {
                 deltaIsZero(line, equation, intersectionPoints);
-                return intersectionPoints;
             }
-            //lista vuota
-            return intersectionPoints;
-        }
-
-        private static void HorizontalLineCase(ImplicitFormStraightLine line,
-                                                ImplicitFormcCircumference circumference,
-                                                LinkedList<CartesianPoint> intersectionPoints)
-        {
-            throw new NotImplementedException();
-        }
-
-        private static void VerticalLineCase(ImplicitFormStraightLine line, 
-                                                ImplicitFormcCircumference circumference, 
-                                                LinkedList<CartesianPoint> intersectionPoints)
-        {
-            throw new NotImplementedException();
         }
 
 

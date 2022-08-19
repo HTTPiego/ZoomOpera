@@ -96,14 +96,14 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
                 ShowMessage(NotValidCoordinate);
                 return;
             }
-            if (!SelectedImageMapShape.Equals(ImageMapShape.Poly.ToString())) //Circle or Rect
+            if ( ! SelectedImageMapShape.Equals("Poly")) //Circle or Rect
             {
                 if (imageMapCoordinates.Count == 2)
                 {
                     ShowMessage(MaxNumberOfCoordinates);
                     return;
                 }
-                if (SelectedImageMapShape.Equals(ImageMapShape.Rect) && imageMapCoordinates.Count != 0)
+                if (SelectedImageMapShape.Equals("Rect") && imageMapCoordinates.Count != 0)
                 {
                     var firstCoordinate = imageMapCoordinates.First();
                     if (imageMapCoordinate.X == firstCoordinate.X
@@ -257,40 +257,6 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
                 imageMapCoordinates.RemoveLast();
         }
 
-        //private bool ThereIsOverlappingInPoly(ImageMapCoordinateDTO coordinateToAdd)
-        //{
-        //    if (imageMapCoordinates.Count < 2)
-        //        return false;
-        //    imageMapCoordinates.OrderBy(c => c.Position);
-        //    List<ImageMapCoordinateDTO[]> listOfCouples = GetVertexesCouples(coordinateToAdd);
-        //    //TODO: posso verificare direttamente solo l'ultima coppia
-        //    for (int i = 0; i < listOfCouples.Count; i++)
-        //    {
-        //        var coupleToCheck = listOfCouples[i];
-        //        Console.WriteLine("Coppia controllata -> " + "Prima coordinata - X=" + coupleToCheck[0].X + ", Y=" + coupleToCheck[0].Y + " - Seconda Coordinata: - X=" + coupleToCheck[1].X + ", Y=" + coupleToCheck[1].Y);
-        //        var straightLineInCouple = StraightLineInTwoPointFinder
-        //                                    .FindStraightLine(new CartesianPoint(coupleToCheck[0].X, coupleToCheck[0].Y),
-        //                                                        new CartesianPoint(coupleToCheck[1].X, coupleToCheck[1].Y));
-        //        Console.WriteLine("Retta coppia controllata -> " + "a: " + straightLineInCouple.a + "b: " + straightLineInCouple.b + "c: " + straightLineInCouple.c);
-        //        for (int j = 0; j < listOfCouples.Count; j++)
-        //        {
-        //            if (i == j)
-        //                continue;
-        //            var coupleOfHypotheticalIntersection = listOfCouples[j];
-        //            Console.WriteLine("Coppia intersezione -> " + "Prima coordinata - X=" + coupleOfHypotheticalIntersection[0].X + ", Y=" + coupleOfHypotheticalIntersection[0].Y + " - Seconda Coordinata: - X=" + coupleOfHypotheticalIntersection[1].X + ", Y=" + coupleOfHypotheticalIntersection[1].Y);
-        //            var straightLineInIntersectionCouple = StraightLineInTwoPointFinder
-        //                                    .FindStraightLine(new CartesianPoint(coupleOfHypotheticalIntersection[0].X, coupleOfHypotheticalIntersection[0].Y),
-        //                                                        new CartesianPoint(coupleOfHypotheticalIntersection[1].X, coupleOfHypotheticalIntersection[1].Y));
-        //            Console.WriteLine("Retta coppia intersezione -> " + "a: " + straightLineInIntersectionCouple.a + "b: " + straightLineInIntersectionCouple.b + "c: " + straightLineInIntersectionCouple.c);
-        //            var intersectionPoint = IntersectionFinder
-        //                                    .IntesectionBetween(straightLineInCouple, straightLineInIntersectionCouple);
-        //            Console.WriteLine("Punto intersezione -> " + "X=" + intersectionPoint.X + ", Y=" + intersectionPoint.Y);
-        //            if (IntersectionPointIsNotValid(intersectionPoint, coupleOfHypotheticalIntersection))
-        //                return true;
-        //        }
-        //    }
-        //    return false;
-        //}
 
         //Ottengo tutte le coppie di vertici in cui posso individuare rette
         private List<ImageMapCoordinateDTO[]> GetVertexesCouples(ImageMapCoordinateDTO coordinateToAdd)
