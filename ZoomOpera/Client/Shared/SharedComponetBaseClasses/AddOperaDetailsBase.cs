@@ -382,7 +382,7 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
         private bool CircleOverlappingSearch()
         {
             Console.WriteLine("controllo circle overlapping");
-            var circleToAdd = GetCircleFrom(this.ImageMapToAdd);
+            //var circleToAdd = GetCircleFrom(this.ImageMapToAdd);
             var operaToDetailImageMaps = OperaImageToDetail.ImageMaps;
             Console.WriteLine("elementi image map " + OperaImageToDetailImageMaps.Count());
             foreach (ImageMap imageMap in OperaImageToDetailImageMaps)
@@ -391,6 +391,7 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
                 {
                     Console.WriteLine("due cerchi");
                     var circleFromImageMap = GetCircleFrom(imageMap);
+                    var circleToAdd = GetCircleFrom(this.ImageMapToAdd);
                     var intersectionPoints = IntersectionFinder.IntesectionBetween(circleToAdd, circleFromImageMap);
                     
                     if (intersectionPoints.Count != 0)
@@ -410,13 +411,14 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
                         double biggerX;
                         double smallerX;
                         AssignBiggerSmallerX(out biggerX, out smallerX, vertexesCouples[i]);
+                        var circleToAdd = GetCircleFrom(this.ImageMapToAdd);
                         var intersectionPoints = IntersectionFinder.IntesectionBetween(straightLinesInImageMapVertexes[i], 
                                                                                         circleToAdd);
                         foreach(var point in intersectionPoints)
                         {
                             if (point.X >= smallerX && point.X <= biggerX)
                             {
-                                Console.WriteLine("overlap tra cerchi e rect/poly");
+                                Console.WriteLine("overlap tra cerchio e rect/poly");
                                 return true;
                             }
                                 
@@ -531,8 +533,8 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
             //List<IImageMapCoordinate[]> vertexesCouples;
 
             ICollection<ImageMapCoordinate> vertexes = imageMap.ImageMapCoordinates;
-            vertexes.OrderBy(c => c.Position);
-            if (imageMap.ImageMapShape.Equals(ImageMapShape.Rect))
+
+            if (imageMap.ImageMapShape.Equals("Rect"))
             {
                 vertexesCouples = GetVertexesCouples(AddTwoMissingVertexesToRect(vertexes));
             }
@@ -543,9 +545,9 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
 
             foreach(var couple in vertexesCouples)
             {
-                var straightLine = StraightLineInTwoPointFinder
-                                    .FindStraightLine(new CartesianPoint(couple[0].X, couple[0].Y),
-                                                        new CartesianPoint(couple[1].X, couple[1].Y));
+                var firstPoint = new CartesianPoint(couple[0].X, couple[0].Y);
+                var secondPoint = new CartesianPoint(couple[1].X, couple[1].Y);
+                var straightLine = StraightLineInTwoPointFinder.FindStraightLine(firstPoint,secondPoint);
                 straightLines.Add(straightLine);
             }
 
@@ -586,9 +588,9 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
         {
             ICollection<ImageMapCoordinate> vertexes = new LinkedList<ImageMapCoordinate>();
 
-            var firstVertex = rectVertexes.First();
+            var firstVertex = rectVertexes.OrderBy(c=>c.Position).First();
             firstVertex.Position = 1;
-            var oppositeVertex = rectVertexes.Last();
+            var oppositeVertex = rectVertexes.OrderBy(c => c.Position).Last();
             oppositeVertex.Position = 3;
 
             var fistMissingVertex = new ImageMapCoordinate(oppositeVertex.X, firstVertex.Y);
@@ -596,10 +598,10 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
             var secondMissingVertex = new ImageMapCoordinate(firstVertex.X, oppositeVertex.Y);
             secondMissingVertex.Position = 4;
 
-            vertexes.Append(firstVertex);
-            vertexes.Append(fistMissingVertex);
-            vertexes.Append(oppositeVertex);
-            vertexes.Append(secondMissingVertex);
+            vertexes.Add(firstVertex);
+            vertexes.Add(fistMissingVertex);
+            vertexes.Add(oppositeVertex);
+            vertexes.Add(secondMissingVertex);
 
             return vertexes;
         }
@@ -608,7 +610,8 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
         {
             List<IImageMapCoordinate[]> listOfCouples = new List<IImageMapCoordinate[]>();
 
-            var coordinates = imageMapsCoordinates.ToArray();
+            var coordinates = imageMapsCoordinates.OrderBy(c=>c.Position).ToArray();
+            
             for (int i = 0; i < coordinates.Length; i++)
             {
                 IImageMapCoordinate[] couple = new IImageMapCoordinate[2];

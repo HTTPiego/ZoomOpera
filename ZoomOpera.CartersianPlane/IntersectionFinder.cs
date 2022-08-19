@@ -29,9 +29,22 @@
             return new CartesianPoint(x, y);
         }
 
-        public static LinkedList<CartesianPoint> IntesectionBetween(ImplicitFormStraightLine line, ImplicitFormcCircumference circumference)
+        public static LinkedList<CartesianPoint> IntesectionBetween(ImplicitFormStraightLine line, 
+                                                                    ImplicitFormcCircumference circumference)
         {
             LinkedList<CartesianPoint> intersectionPoints = new LinkedList<CartesianPoint>();
+
+            if (line.a == 0)
+            {
+                HorizontalLineCase(line, circumference, intersectionPoints);
+                return intersectionPoints;
+            }
+
+            if (line.b == 0)
+            {
+                VerticalLineCase(line, circumference, intersectionPoints);
+                return intersectionPoints;
+            }
 
             //dopo aver ricavato la x dalla retta
             //la sostituisco nella circonferenza e ne ottengo
@@ -56,6 +69,20 @@
             return intersectionPoints;
         }
 
+        private static void HorizontalLineCase(ImplicitFormStraightLine line,
+                                                ImplicitFormcCircumference circumference,
+                                                LinkedList<CartesianPoint> intersectionPoints)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void VerticalLineCase(ImplicitFormStraightLine line, 
+                                                ImplicitFormcCircumference circumference, 
+                                                LinkedList<CartesianPoint> intersectionPoints)
+        {
+            throw new NotImplementedException();
+        }
+
 
         private static SecondGradeEquation GetEquationFrom(ImplicitFormStraightLine line,
                                                             ImplicitFormcCircumference circumference)
@@ -74,18 +101,22 @@
             var c3 = circumference.A * (-line.c);
 
             //elimino denominatore moltiplicando tutto per il quadrato della 'a' della retta
-            circumference.CoefficientOfSquaredY *= denominatorCoefficientOfSquaredY_2;
+
+            //circumference.CoefficientOfSquaredY *= denominatorCoefficientOfSquaredY_2;
+            var squared_y = circumference.CoefficientOfSquaredY * denominatorCoefficientOfSquaredY_2;
             b3 *= (denominatorCoefficientOfSquaredY_2 / Denominator_b3);
             c3 *= (denominatorCoefficientOfSquaredY_2 / Denominator_b3);
-            circumference.B *= denominatorCoefficientOfSquaredY_2;
-            circumference.C *= denominatorCoefficientOfSquaredY_2;
+            //circumference.B *= denominatorCoefficientOfSquaredY_2;
+            var b = circumference.B * denominatorCoefficientOfSquaredY_2;
+            //circumference.C *= denominatorCoefficientOfSquaredY_2;
+            var c = circumference.C * denominatorCoefficientOfSquaredY_2;
 
             //ricavo equazione secondo grado --> ay^2 + by + c = 0
-            var a = circumference.CoefficientOfSquaredY + coefficientOfSquaredY_2;
-            var b = circumference.B + b2 + b3;
-            var c = circumference.C + c2 + c3;
+            var equation_a = squared_y + coefficientOfSquaredY_2;
+            var equation_b = b + b2 + b3;
+            var equation_c = c + c2 + c3; 
 
-            return new SecondGradeEquation(a, b, c);
+            return new SecondGradeEquation(equation_a, equation_b, equation_c);
         }
 
         private static void deltaGreaterThanZero(ImplicitFormStraightLine line, 
