@@ -429,14 +429,17 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
                 AssignBiggerSmallerX(out biggerX, out smallerX, vertexesCouples[i]);
                 foreach (ImageMap imageMap in operaToDetailImageMaps)
                 {
-                    if (imageMap.ImageMapShape.Equals(ImageMapShape.Circle))
+                    if (imageMap.ImageMapShape.Equals("Circle"))
                     {
                         var intersectionPoints = IntersectionFinder.IntesectionBetween(linesInImageMapToAdd[i], 
                                                                                         GetCircleFrom(imageMap));
                         foreach (var point in intersectionPoints)
                         {
                             if (point.X >= smallerX && point.X <= biggerX)
+                            {
+                                Console.WriteLine("overlap tra rect/poly e cerchio");
                                 return true;
+                            }
                         }
                     }
                     else
@@ -447,7 +450,10 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
                             var intersectionPoint = IntersectionFinder.IntesectionBetween(linesInImageMapToAdd[i],
                                                                                             lineDBImageMap);
                             if (intersectionPoint.X >= smallerX && intersectionPoint.X <= biggerX)
+                            {
+                                Console.WriteLine("overlap tra rect/poly e rect/poly");
                                 return true;
+                            }
                         }
                     }
                 }
