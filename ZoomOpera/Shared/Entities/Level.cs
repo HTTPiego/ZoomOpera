@@ -42,7 +42,7 @@ namespace ZoomOpera.Shared.Entities
                 return false;
             if (dto.LevelNumber != LevelNumber 
                 //|| dto.Planimetry != Planimetry 
-                || dto.BuildingId != BuildingId)
+                || ! dto.BuildingId.Equals(BuildingId))
                 return false;
             return true;
         }

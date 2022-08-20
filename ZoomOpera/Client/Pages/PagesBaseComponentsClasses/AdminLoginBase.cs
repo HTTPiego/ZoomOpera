@@ -41,7 +41,7 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
             {
                 await LocalStorage.SetItemAsStringAsync("jwt", jwt.Token);
                 await StateProvider.GetAuthenticationStateAsync();
-                NavigationManager.NavigateTo("/home");
+                NavigationManager.NavigateTo("/home-admin");
             }
             else
             {
@@ -51,7 +51,7 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
             }
         }
 
-        public async Task<IAdmin?> GetPlatformByJwt()
+        public async Task<IAdmin?> GetAdminByJwt()
         {
 
             var jwt = await LocalStorage.GetItemAsStringAsync("jwt");

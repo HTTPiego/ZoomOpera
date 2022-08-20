@@ -136,8 +136,8 @@ namespace ZoomOpera.Server.Controllers
                 if (DtoIsNotValid(dto))
                     return BadRequest("Building is not valid");
 
-                if (this.BuildingCanNotBeUpdated(dto, idBuilding))
-                    return BadRequest("A similar building has been already registered");
+                //if (this.BuildingCanNotBeUpdated(dto, idBuilding))
+                //    return BadRequest("A similar building has been already registered");
 
                 var buildingToUpdate = await _buildingService.GetEntity(idBuilding);
 
@@ -158,10 +158,10 @@ namespace ZoomOpera.Server.Controllers
 
         private bool BuildingCanNotBeUpdated(BuildingDTO dto, Guid buildingId)
         {
-            var equalAdmin = this._buildingService.FindFirstBy(building => new ValueTask<bool>(building.EqualsTo(dto))).Result;
-            if (equalAdmin == null)
+            var equalBuilding = this._buildingService.FindFirstBy(building => new ValueTask<bool>(building.EqualsTo(dto))).Result;
+            if (equalBuilding == null)
                 return false;
-            if (equalAdmin.Id.Equals(buildingId))
+            if (equalBuilding.Id.Equals(buildingId))
                 return false;
             return true;
         }

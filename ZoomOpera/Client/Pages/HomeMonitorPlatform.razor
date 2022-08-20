@@ -1,0 +1,24 @@
+﻿@page "/home-platform"
+@attribute [Authorize(Roles = "Admin, MonitorPlatform")]
+
+<h3>Home</h3>
+
+<AuthorizeView>
+    <Authorized>
+        <h4>Piattaforma Monitor:</h4> 
+        <br />
+        <p> @context.User.Identity.Name</p>
+        <NavLink class="nav-link" href="visualizza-opere-piano">
+            <span aria-hidden="true"></span> Visualizza Opere nel Piano
+        </NavLink>
+    </Authorized>
+    <NotAuthorized>
+        Not Authorized: try Login
+    </NotAuthorized>
+</AuthorizeView>
+
+
+
+@code {
+
+}

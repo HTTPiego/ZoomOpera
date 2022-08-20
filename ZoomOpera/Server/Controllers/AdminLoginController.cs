@@ -71,7 +71,7 @@ namespace ZoomOpera.Server.Controllers
         }
 
         [HttpPost("get-admin")]
-        public IActionResult GetUserByJwt([FromBody] string token)
+        public async Task<ActionResult<IAdmin>> GetUserByJwt([FromBody] string token)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
 
@@ -97,9 +97,8 @@ namespace ZoomOpera.Server.Controllers
             if (jwtSecurityToken != null && jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256,
                                                                                 StringComparison.InvariantCultureIgnoreCase))
             {
-                var userName = principle.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                return Ok(_adminService.FindFirstBy(admin => new ValueTask<bool>
-                                                                (admin.Name.Equals(userName))));
+                var userName = principle.FindFirst(ClaimTypes.Name)?.Value;
+                return Ok(await _adminService.FindFirstBy(admin => new ValueTask<bool> (admin.Name.Equals(userName))));
             }
 
             return NotFound("token strano");

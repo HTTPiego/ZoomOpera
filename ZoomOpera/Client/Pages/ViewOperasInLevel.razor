@@ -1,0 +1,18 @@
+﻿@page "/visualizza-opere-piano"
+@inherits ViewOperasInLevelBase
+@attribute [Authorize(Roles = "Admin, MonitorPlatform")]
+
+<h3>Opere nel Piano</h3>
+
+<h4>Planimetria Piano:</h4>
+<br />
+<img src="@MonitorPlatformLevel.Planimetry"/>
+<br />
+<br />
+<h4>Opere presenti:</h4>
+<ul>
+    @foreach(var opera in @OperasInLevel)
+    {
+        <li> <button class="btn-link" @onclick="() => ViewOpera(opera.Id)"> @opera.Name </button> </li>
+    }
+</ul>

@@ -22,17 +22,17 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
         protected ILoginService<IMonitorPlatform> Service { get; set; }
 
         [Parameter]
-        public LoginDTO LoginDatas { get; set; } = new LoginDTO();
+        public LoginDTO LoginCredentials { get; set; } = new LoginDTO();
 
         public async Task Login()
         {
-            var jwt = await Service.Login(LoginDatas);
+            var jwt = await Service.Login(LoginCredentials);
 
             if (jwt.Token != string.Empty)
             {
                 await LocalStorage.SetItemAsStringAsync("jwt", jwt.Token);
                 await StateProvider.GetAuthenticationStateAsync();
-                NavigationManager.NavigateTo("/home");
+                NavigationManager.NavigateTo("/home-platform");
             }
             else
             {
@@ -50,12 +50,12 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
             if (jwt == string.Empty)
                 return null;
 
-            var admin = await Service.GetAccountByJwt(new JwtDTO(jwt));
+            var monitorPlatform = await Service.GetAccountByJwt(new JwtDTO(jwt));
 
-            if (admin == null)
+            if (monitorPlatform == null)
                 return null;
 
-            return await Task.FromResult(admin);
+            return await Task.FromResult(monitorPlatform);
         }
 
     }

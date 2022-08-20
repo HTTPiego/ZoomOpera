@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZoomOpera.Shared", "ZoomOpe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZoomOpera.DTOs", "ZoomOpera.Shared.DTOs\ZoomOpera.DTOs.csproj", "{EAA6FC1C-0D8D-4080-A3DB-26F53CD0081B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZoomOpera.CartersianPlane", "ZoomOpera.CartersianPlane\ZoomOpera.CartersianPlane.csproj", "{43D50C85-C544-45FB-A11E-D0F35DDC02C6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZoomOpera.CartersianPlane", "ZoomOpera.CartersianPlane\ZoomOpera.CartersianPlane.csproj", "{43D50C85-C544-45FB-A11E-D0F35DDC02C6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

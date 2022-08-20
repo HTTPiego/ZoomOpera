@@ -39,8 +39,8 @@ namespace ZoomOpera.Server.Controllers
             return await Task.FromResult(new JwtDTO(token));
         }
 
-        [HttpPost("get-platfrom")]
-        public async Task<ActionResult<IMonitorPlatform>> GetPlatformByJwt([FromBody] JwtDTO jwt)
+        [HttpPost("get-platform")]
+        public async Task<IMonitorPlatform> GetPlatformByJwt([FromBody] JwtDTO jwt)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
 
@@ -65,12 +65,14 @@ namespace ZoomOpera.Server.Controllers
             if (jwtSecurityToken != null && jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256,
                                                                                 StringComparison.InvariantCultureIgnoreCase))
             {
-                var userName = principle.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                return Ok(await _platformService.FindFirstBy(platform => new ValueTask<bool>
-                                                                ( platform.Name.Equals(userName))));
+                var userName = principle.FindFirst(ClaimTypes.Name)?.Value;
+                var platform = await _platformService.FindFirstBy(platform => new ValueTask<bool>(platform.Name.Equals(userName)));
+                //return Ok(platform);
+                return await _platformService.FindFirstBy(platform => new ValueTask<bool>(platform.Name.Equals(userName)));
             }
 
-            return NotFound("Token not found");
+            return null;
+            //return NotFound("Token not found");
         }
 
         private string Generate(IMonitorPlatform platform)
