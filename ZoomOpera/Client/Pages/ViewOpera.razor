@@ -1,6 +1,40 @@
-﻿@page "/visualizza-opere-piano/{operaToViewId:guid}"
+﻿@page "/visualizza-opere-piano/{OperaToViewId:guid}"
 @inherits ViewOperaBase
 @attribute [Authorize(Roles = "Admin, MonitorPlatform")]
 
-<h3>ViewOpera</h3>
+<h3>Titolo: </h3>
+<p>@OperaToView.Name</p>
+<br />
+<br />
+<img src="@Image.Image" usemap="#OperaToView"/>
 
+<map name="OperaToView"> 
+    @foreach(var imageMap in ImageMaps)
+    {
+        <area shape="@imageMap.ImageMapShape.ToLower()" 
+              coords="@Prova(imageMap)" 
+              target="_details"
+              onclick="@OnReadDetails(imageMap.Id)"
+        />
+    }
+</map>
+
+<br />
+
+@if (this.ReadDetails)
+{
+    <iframe src="@linkDetails" name="_details"> </iframe>
+    <br />
+    <button class="btn-close" @onclick="ChiudiDettagli">Chiudi Dettagli</button>
+}
+
+<br />
+<br />
+
+<h3>Autore: </h3>
+<p>@OperaToView.AuthorFirstName @OperaToView.AuthorLastName</p>
+
+<br />
+
+<h3>Informazioni sull'Opera:</h3><br />
+<p>@OperaToView.ItalianDescription</p>

@@ -1,0 +1,8 @@
+﻿@page "/descrizione-dettagliata/{ImageMapId:guid}"
+@inherits ViewOperaDetailsBase
+@attribute [Authorize(Roles = "Admin, MonitorPlatform")]
+
+<h3>@Details.Name</h3>
+<br />
+<p>@Details.DetailedDescription</p>
+
