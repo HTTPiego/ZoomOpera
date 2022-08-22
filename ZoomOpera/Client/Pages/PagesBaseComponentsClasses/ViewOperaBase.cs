@@ -40,17 +40,16 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
 
         public string linkDetails = string.Empty;
 
-        public object OnReadDetails(Guid imageMapId)
+        public void OnReadDetails(Guid imageMapId)
         {
             this.ReadDetails = true;
             SelectedImageMapId = imageMapId;
-            NavigationManager.NavigateTo($"https://localhost:7288/descrizione-dettagliata/{imageMapId}");
+            //NavigationManager.NavigateTo($"https://localhost:7288/descrizione-dettagliata/{imageMapId}");
             //linkDetails = $"https://localhost:7288/descrizione-dettagliata/{imageMapId}";
-            return null;
-        }
+        }   
 
 
-        public string Prova(IImageMap imageMap)
+        public string GetImageMapCoords(IImageMap imageMap)
         {
             var coords = Coords.FindAll(c => c.ImageMapId.Equals(imageMap.Id)).OrderBy(c => c.Position).ToArray();
             string coordToString = string.Empty;

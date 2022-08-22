@@ -12,9 +12,9 @@
     @foreach(var imageMap in ImageMaps)
     {
         <area shape="@imageMap.ImageMapShape.ToLower()" 
-              coords="@Prova(imageMap)" 
+              coords="@GetImageMapCoords(imageMap)" 
               alt="Errore"
-              href="https://localhost:7288/home-platform"
+              @onclick="() => OnReadDetails(imageMap.Id)"
               target="_blank"
         />
     }
@@ -22,14 +22,14 @@
 
 <br />
 
-@*<div>
+<div>
 @if (this.ReadDetails)
 {
     <ViewOperaDetails ImageMapId="@SelectedImageMapId" />
     <br /> 
-    <button class="btn-close" @onclick="ChiudiDettagli">Chiudi Dettagli</button>
+    <button class="btn-close" @onclick="ChiudiDettagli"/>
 }
-</div>*@
+</div>
 
 <br />
 <br />
