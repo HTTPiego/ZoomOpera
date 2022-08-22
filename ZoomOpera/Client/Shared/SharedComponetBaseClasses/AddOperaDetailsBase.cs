@@ -86,11 +86,11 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
         //}
 
         public void AddImageMapCoordinate(MouseEventArgs e)
-        {
-            X = e.ClientX;
-            Y = e.ClientY;
+        {   
+            X = e.OffsetX;
+            Y = e.OffsetY;
             Counter++;
-            var imageMapCoordinate = new ImageMapCoordinateDTO(e.ClientX, e.ClientY);
+            var imageMapCoordinate = new ImageMapCoordinateDTO(e.OffsetX, e.OffsetY);
             if (imageMapCoordinates.Contains(imageMapCoordinate))
             {
                 ShowMessage(NotValidCoordinate);

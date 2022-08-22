@@ -34,6 +34,8 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
 
         public List<IImageMapCoordinate> Coords { get; set; } = new List<IImageMapCoordinate>();
 
+        public Guid SelectedImageMapId { get; set; }
+
         public bool ReadDetails { get; set; }
 
         public string linkDetails = string.Empty;
@@ -41,7 +43,9 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
         public object OnReadDetails(Guid imageMapId)
         {
             this.ReadDetails = true;
-            linkDetails = $"https://localhost:7288/descrizione-dettagliata/{imageMapId}";
+            SelectedImageMapId = imageMapId;
+            NavigationManager.NavigateTo($"https://localhost:7288/descrizione-dettagliata/{imageMapId}");
+            //linkDetails = $"https://localhost:7288/descrizione-dettagliata/{imageMapId}";
             return null;
         }
 
@@ -62,7 +66,7 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
                 }
                 else
                 {
-                    coordToString += coords[i].X.ToString() + "," + coords[i].Y.ToString() + ", ";
+                    coordToString += coords[i].X.ToString() + "," + coords[i].Y.ToString() + ",";
                 }
             }
 

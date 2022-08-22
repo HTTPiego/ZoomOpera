@@ -6,27 +6,30 @@
 <p>@OperaToView.Name</p>
 <br />
 <br />
-<img src="@Image.Image" usemap="#OperaToView"/>
+<img src="@Image.Image" usemap="#opera"/>
 
-<map name="OperaToView"> 
+<map name="opera"> 
     @foreach(var imageMap in ImageMaps)
     {
         <area shape="@imageMap.ImageMapShape.ToLower()" 
               coords="@Prova(imageMap)" 
-              target="_details"
-              onclick="@OnReadDetails(imageMap.Id)"
+              alt="Errore"
+              href="https://localhost:7288/home-platform"
+              target="_blank"
         />
     }
 </map>
 
 <br />
 
+@*<div>
 @if (this.ReadDetails)
 {
-    <iframe src="@linkDetails" name="_details"> </iframe>
-    <br />
+    <ViewOperaDetails ImageMapId="@SelectedImageMapId" />
+    <br /> 
     <button class="btn-close" @onclick="ChiudiDettagli">Chiudi Dettagli</button>
 }
+</div>*@
 
 <br />
 <br />
@@ -38,3 +41,27 @@
 
 <h3>Informazioni sull'Opera:</h3><br />
 <p>@OperaToView.ItalianDescription</p>
+
+
+@*<map name="OperaToView"> 
+    @foreach(var imageMap in ImageMaps)
+    {
+        <area shape="@imageMap.ImageMapShape.ToLower()" 
+              coords="@Prova(imageMap)" 
+              target="_details"
+              href="@linkDetails"
+              @onclick="() => OnReadDetails(imageMap.Id)"
+        >
+    }
+</map>
+
+<br />
+
+<div>
+@if (this.ReadDetails)
+{
+    <iframe src="@linkDetails" name="_details"> </iframe>
+    <br /> 
+    <button class="btn-close" @onclick="ChiudiDettagli">Chiudi Dettagli</button>
+}
+</div>*@
