@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.JSInterop;
 using ZoomOpera.Client.Entities.Interfaces;
 using ZoomOpera.Client.Services.Interfaces;
 using ZoomOpera.Client.Utils.Interfaces;
@@ -17,6 +18,9 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
 
         [Inject]
         protected NavigationManager NavigationManager { get; set; }
+
+        [Inject]
+        protected IJSRuntime JSRuntime { get; set; }
 
         [Parameter]
         public Guid LevelToModifyId { get; set; }
@@ -38,9 +42,17 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
 
         public async void ModifyLevel()
         {
-            ILevel updatedLevel = await Service.UpdateEntity(UpdatingLevel, LevelToModifyId);
-            Handler.FireEvent(updatedLevel);
-            NavigationManager.NavigateTo($"/strutture/{FatherBuildingId}/piani");
+            try
+            {
+                ILevel updatedLevel = await Service.UpdateEntity(UpdatingLevel, LevelToModifyId);
+                Handler.FireEvent(updatedLevel);
+                NavigationManager.NavigateTo($"/strutture/{FatherBuildingId}/piani");
+            }
+            catch(Exception ex)
+            {
+                await JSRuntime.InvokeVoidAsync("Alert", "Modifica non valida");
+            }
+            
         }
 
         protected override async Task OnInitializedAsync()

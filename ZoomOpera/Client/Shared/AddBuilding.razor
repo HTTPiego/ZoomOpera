@@ -8,7 +8,7 @@
     <EditForm Model="@BuildingToAdd" OnSubmit="@AddBuilding">
         <DataAnnotationsValidator />
          <label class="form-label" for="name">Nome Stuttura</label>
-         <InputText id="name" @bind-Value="BuildingToAdd.Name"/>
+         <InputText id="name" @bind-Value="BuildingToAdd.Name" placeholder="ciao" />
          <ValidationMessage For="@(() => BuildingToAdd.Name)" />
          <br />
          <label class="form-label" for="code">Codice Struttura</label>

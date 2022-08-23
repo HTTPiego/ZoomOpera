@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.JSInterop;
 using ZoomOpera.Client.Entities.Interfaces;
 using ZoomOpera.Client.Services.Interfaces;
 using ZoomOpera.DTOs;
@@ -20,6 +21,9 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
         [Inject]
         protected IService<ILevel, LevelDTO> Service { get; set; }
 
+        [Inject]
+        protected IJSRuntime JSRuntime { get; set; }
+
         public async Task OnUploadedPlanimetry(InputFileChangeEventArgs e)
         {
             var format = "image/png";
@@ -32,9 +36,17 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
 
         public async Task AddLevel()
         {
-            LevelToAdd.BuildingId = FatherBuildingId;
-            ILevel AddedLevel = await Service.AddEntity(LevelToAdd);
-            await LevelAdded.InvokeAsync(AddedLevel);
+            try
+            {
+                LevelToAdd.BuildingId = FatherBuildingId;
+                ILevel AddedLevel = await Service.AddEntity(LevelToAdd);
+                await LevelAdded.InvokeAsync(AddedLevel);
+            }
+            catch(Exception ex)
+            {
+                await JSRuntime.InvokeVoidAsync("Alert", "Piano non valido");
+            }
+            
         }
 
         protected override async Task OnInitializedAsync()

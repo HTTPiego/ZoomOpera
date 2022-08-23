@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using ZoomOpera.Client.Entities.Interfaces;
 using ZoomOpera.Client.Services.Interfaces;
 using ZoomOpera.Client.Utils.Interfaces;
@@ -17,6 +18,9 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
         [Inject]
         protected NavigationManager NavigationManager { get; set; }
 
+        [Inject]
+        protected IJSRuntime JSRuntime { get; set; }
+
         [Parameter]
         public Guid BuildingToModifyId { get; set; }
 
@@ -24,9 +28,17 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
 
         public async Task ModifyBuilding()
         {
-            IBuilding modifiedBuilding = await Service.UpdateEntity(UpdatingBuilding, BuildingToModifyId);
-            Handler.FireEvent(modifiedBuilding);
-            NavigationManager.NavigateTo("/strutture");
+            try
+            {
+                IBuilding modifiedBuilding = await Service.UpdateEntity(UpdatingBuilding, BuildingToModifyId);
+                Handler.FireEvent(modifiedBuilding);
+                NavigationManager.NavigateTo("/strutture");
+            }
+            catch(Exception ex)
+            {
+                await JSRuntime.InvokeVoidAsync("Alert", "Modifica non valida");
+            }
+            
         }
 
         protected override async Task OnInitializedAsync()

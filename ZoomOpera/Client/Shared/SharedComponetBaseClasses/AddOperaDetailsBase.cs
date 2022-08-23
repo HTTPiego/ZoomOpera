@@ -46,7 +46,7 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
 
         public Message MaxNumberOfCoordinates = new Message();  
 
-        public Message ImageMapIsOverlapped = new Message();    
+        public Message ImageMapIsNotValid = new Message();    
         public ImageMapDTO ImageMapToAdd { get; set; }
             
         public LinkedList<ImageMapCoordinateDTO> imageMapCoordinates { get; set; }
@@ -323,7 +323,7 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
             }
             else
             {
-                ShowMessage(ImageMapIsOverlapped);
+                ShowMessage(ImageMapIsNotValid);
             }
             OperaImageToDetail = await OperaImageService.GetEntityByfatherRelationshipId(OperaToDetailId);
             OperaImageToDetailImageMaps = await ImageMapService.GetAllByfatherRelationshipId(OperaImageToDetail.Id);

@@ -141,8 +141,8 @@ namespace ZoomOpera.Server.Controllers
                 if (OperaIsNotValid(dto))
                     return BadRequest("Opera is not valid");
 
-                if (this.OperaCanNotBeUpdated(dto, operaId))
-                    return BadRequest("A similar Opera has been already registered");
+                //if (this.OperaCanNotBeUpdated(dto, operaId))
+                //    return BadRequest("A similar Opera has been already registered");
 
                 var operaToUpdate = await _operaService.GetEntity(operaId);
 

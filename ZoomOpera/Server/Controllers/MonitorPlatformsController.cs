@@ -146,7 +146,7 @@ namespace ZoomOpera.Server.Controllers
                 if (MonitorPlatformIsNotValid(dto))
                     return BadRequest("Monitor Platform is not valid");
 
-                if (this.TwoEqualPlatforms(dto))
+                if (this.PlatformCanNotBeUpdated(dto, idPlatfrom))
                     return BadRequest("A similar Platform has been already registered");
 
                 var platformToUpdate = await _platformService.GetEntity(idPlatfrom);
@@ -170,5 +170,16 @@ namespace ZoomOpera.Server.Controllers
             }
         }
 
+        private bool PlatformCanNotBeUpdated(MonitorPlatformDTO dto, Guid platformId)
+        {
+            IMonitorPlatform equalPlatform = this._platformService
+                                .FindFirstBy(dbPlatform =>
+                                                new ValueTask<bool>(dbPlatform.Name.ToLower().Equals(dto.Name.ToLower()))).Result;
+            if (equalPlatform == null)
+                return false;
+            if (equalPlatform.Id.Equals(platformId))
+                return false;
+            return true;
+        }
     }
 }

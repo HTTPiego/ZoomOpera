@@ -111,8 +111,8 @@ namespace ZoomOpera.Server.Controllers
                 if (LocationIsNotValid(dto))
                     return BadRequest("Location is not valid");
 
-                if (this.LocationCanNotBeUpdated(dto, locationId))
-                    return BadRequest($"A similar Location has been already registered");
+                //if (this.LocationCanNotBeUpdated(dto, locationId))
+                //    return BadRequest($"A similar Location has been already registered");
 
                 var locationToUpdate = await _locationService.GetEntity(locationId);
 

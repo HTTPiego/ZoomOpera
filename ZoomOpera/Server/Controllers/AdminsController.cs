@@ -165,7 +165,9 @@ namespace ZoomOpera.Server.Controllers
 
         private bool AdminCanNotBeUpdated(AdminDTO dto, Guid adminId)
         {
-            IAdmin equalAdmin = this._adminService.FindFirstBy(dbAdmin => new ValueTask<bool>(dbAdmin.Equals(dto))).Result;
+            IAdmin equalAdmin = this._adminService
+                                .FindFirstBy(dbAdmin => 
+                                                new ValueTask<bool>(dbAdmin.Name.ToLower().Equals(dto.Name.ToLower()))).Result;
             if (equalAdmin == null)
                 return false;
             if (equalAdmin.Id.Equals(adminId))

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using ZoomOpera.Client.Entities.Interfaces;
 using ZoomOpera.Client.Services.Interfaces;
 using ZoomOpera.DTOs;
@@ -9,6 +10,9 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
     {
         [Inject]
         protected IService<ILocation, LocationDTO> Service { get; set; }
+
+        [Inject]
+        protected IJSRuntime JSRuntime { get; set; }
 
         [Parameter]
         public EventCallback<ILocation> LocationAdded { get; set; }
@@ -23,9 +27,17 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
 
         public async void AddLocation()
         {
-            LocationToAdd.LevelId = FatherLevelId;
-            ILocation addedLocation = await Service.AddEntity(LocationToAdd);
-            await LocationAdded.InvokeAsync(addedLocation);
+            try
+            {
+                LocationToAdd.LevelId = FatherLevelId;
+                ILocation addedLocation = await Service.AddEntity(LocationToAdd);
+                await LocationAdded.InvokeAsync(addedLocation);
+            }
+            catch(Exception ex)
+            {
+                await JSRuntime.InvokeVoidAsync("Alert", "Locazione Opera non valida");
+            }
+            
         }
 
     }

@@ -36,6 +36,20 @@
     @*<button class="btn-close" @onclick="DeleteLastCoordinate">Indietro</button>*@
 </div>
 
+@if (@MaxNumberOfCoordinates.ShowMessage)
+{
+    <p class="alert">Numero massimo di coordinate per il tipo area descrizione raggiunto</p>
+}
+@if (@NotValidCoordinate.ShowMessage)
+{
+    <p class="alert">Coordinata non valida</p>
+}
+@if (@ImageMapIsNotValid.ShowMessage)
+{
+    <p class="alert">Area descrizione non valida</p>
+}
+
+
 <div>
     <EditForm Model="@ImageMapToAdd" OnSubmit="AddImageMap">
         <DataAnnotationsValidator />

@@ -126,7 +126,8 @@ namespace ZoomOpera.Server.Controllers
 
         private async Task<bool> LevelCanNotBeUpdated(LevelDTO dto, Guid levelId)
         {
-            var equalLevel = await this._levelService.FindFirstBy(l => new ValueTask<bool>(l.EqualsTo(dto)));
+            var equalLevel = await this._levelService
+                                    .FindFirstBy(l => new ValueTask<bool>(l.EqualsTo(dto)));
             //if (equalLevel == null)
             //    return true;
             if (equalLevel.Id.Equals(levelId))

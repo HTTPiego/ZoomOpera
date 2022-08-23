@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.JSInterop;
 using ZoomOpera.Client.Entities.Interfaces;
 using ZoomOpera.Client.Services.Interfaces;
 using ZoomOpera.Client.Utils.Interfaces;
@@ -12,8 +13,8 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
         [Inject]
         protected IService<IOpera, OperaDTO> OperaService { get; set; }
 
-        //[Inject]
-        //protected IService<IOperaImage, OperaImageDTO> OperaImageService { get; set; }
+        [Inject]
+        protected IJSRuntime JSRuntime { get; set; }
 
         [Inject]
         protected IEventHandler<IOpera> EventHandler { get; set; }
@@ -46,11 +47,19 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
 
         public async void AddOpera()
         {
-            OperaToAdd.LocationId = FatherLocationId;
-            OperaToAdd.OperaImage = OperaImageToAdd;
-            IOpera addedOpera = await OperaService.AddEntity(OperaToAdd);
-            EventHandler.FireEvent(addedOpera);
-            NavigationManager.NavigateTo($"/strutture/{FatherBuildingId}/piani/{FatherLevelId}/locazioni-opere");
+            try
+            {
+                OperaToAdd.LocationId = FatherLocationId;
+                OperaToAdd.OperaImage = OperaImageToAdd;
+                IOpera addedOpera = await OperaService.AddEntity(OperaToAdd);
+                EventHandler.FireEvent(addedOpera);
+                NavigationManager.NavigateTo($"/strutture/{FatherBuildingId}/piani/{FatherLevelId}/locazioni-opere");
+            }
+            catch (Exception ex)
+            {
+                await JSRuntime.InvokeVoidAsync("Alert", "Opera non valida");
+            }
+            
         }
 
     }

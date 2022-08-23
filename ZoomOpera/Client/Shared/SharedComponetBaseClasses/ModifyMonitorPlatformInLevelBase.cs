@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using ZoomOpera.Client.Entities.Interfaces;
 using ZoomOpera.Client.Services.Interfaces;
 using ZoomOpera.Client.Utils.Interfaces;
@@ -10,6 +11,9 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
     {
         [Inject]
         protected IService<IMonitorPlatform, MonitorPlatformDTO> Service { get; set; }
+
+        [Inject]
+        protected IJSRuntime JSRuntime { get; set; }
 
         [Inject]
         protected NavigationManager NavigationManager { get; set; }
@@ -30,9 +34,17 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
 
         public async void ModifyPlatform()
         {
-            IMonitorPlatform updatedPlatform = await Service.UpdateEntity(UpdatingPlatform, PlatformToModifyId);
-            EventHandler.FireEvent(updatedPlatform);
-            NavigationManager.NavigateTo($"/strutture/{FatherBuildingId}/piani/{FatherLevelId}/piattaforme-monitor");
+            try
+            {
+                IMonitorPlatform updatedPlatform = await Service.UpdateEntity(UpdatingPlatform, PlatformToModifyId);
+                EventHandler.FireEvent(updatedPlatform);
+                NavigationManager.NavigateTo($"/strutture/{FatherBuildingId}/piani/{FatherLevelId}/piattaforme-monitor");
+            }
+            catch(Exception ex)
+            {
+                await JSRuntime.InvokeVoidAsync("Alert", "Modifica non valida");
+            }
+            
         }
 
         protected override async Task OnInitializedAsync()
