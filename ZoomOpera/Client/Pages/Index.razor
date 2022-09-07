@@ -1,9 +1,19 @@
 ﻿@page "/"
+@layout NoNavLayout
 
-<PageTitle>Index</PageTitle>
+<PageTitle>ZoomOpera</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Benvenuto</h1>
 
-Welcome to your new app.
+<br />
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+<NavLink class="nav-link" href="platform-login" Match="NavLinkMatch.All">
+    Login Piattaforme Monitor
+</NavLink>
+
+<br />
+
+<NavLink class="nav-link" href="admin-login" Match="NavLinkMatch.All">
+    Login Amministratori
+</NavLink>
+
