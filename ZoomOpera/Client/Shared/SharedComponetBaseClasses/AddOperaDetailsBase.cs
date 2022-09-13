@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Blazor.Extensions;
+using Blazor.Extensions.Canvas.Canvas2D;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using System.Timers;
 using ZoomOpera.CartersianPlane;
 using ZoomOpera.Client.Entities;
@@ -14,10 +17,10 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
     public class AddOperaDetailsBase : ComponentBase
     {
         [Inject]
-        IService<IOperaImage, OperaImageDTO> OperaImageService { get; set; }
+        protected IService<IOperaImage, OperaImageDTO> OperaImageService { get; set; }
 
         [Inject]
-        IService<IImageMap, ImageMapDTO> ImageMapService { get; set; }
+        protected IService<IImageMap, ImageMapDTO> ImageMapService { get; set; }
 
         [Inject]
         public NavigationManager NavigationManager { get; set; }
@@ -50,6 +53,136 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
         public ImageMapDTO ImageMapToAdd { get; set; }
             
         public LinkedList<ImageMapCoordinateDTO> imageMapCoordinates { get; set; }
+
+        //______________________________
+
+        [Inject]
+        protected IJSRuntime JSRuntime { get; set; }
+
+        private Canvas2DContext _context;
+
+        protected BECanvasComponent _canvasReference;
+
+        public ElementReference OperaImage { get; set; }
+
+        public int imageWidth { get; set; }
+
+        public int imageEight { get; set; }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            imageWidth = await JSRuntime.InvokeAsync<int>("GetWidth");
+            imageEight = await JSRuntime.InvokeAsync<int>("GetEight");
+
+            this._context = await this._canvasReference.CreateCanvas2DAsync();
+
+            await this._context.DrawImageAsync(OperaImage, 0, 0);
+
+            await DrawCanvasAreaBordes();
+
+            await DrawDBImageMaps();
+        }
+
+        private async Task DrawCanvasAreaBordes()
+        {
+            await _context.BeginPathAsync();
+
+            await _context.MoveToAsync(0, 0);
+            await _context.LineToAsync(0, 400);
+            await _context.LineToAsync(500, 400);
+            await _context.LineToAsync(500, 0);
+            await _context.ClosePathAsync();
+            await _context.StrokeAsync();
+        }
+
+        private async Task DrawDBImageMaps()
+        {
+            foreach (var imageMap in this.OperaImageToDetailImageMaps)
+            {
+                DrawImageMap(imageMap);
+            }
+        }
+
+        private void DrawImageMap(IImageMap imageMap)
+        {
+            if (imageMap.ImageMapShape.Equals("Circle"))
+            {
+
+                DrawCircle(imageMap);
+
+            } else if (imageMap.ImageMapShape.Equals("Rect"))
+            {
+
+                DrawRect(imageMap);
+
+            } else // Poly
+            {
+
+                DrawPoly(_context, imageMap);
+
+            }
+        }
+
+        private async void DrawCircle(IImageMap imageMap)
+        {
+            var circleCoords = imageMap.ImageMapCoordinates.OrderBy(c=>c.Position).ToArray();
+            var center = circleCoords[0];
+            var circPoint = circleCoords[1];
+
+            await _context.BeginPathAsync();
+            await _context.ArcAsync(center.X, center.Y, 
+                                    CircumferenceFinder.FindRadius(new CartesianPoint(center.X, center.Y),
+                                                                   new CartesianPoint(circPoint.X, circPoint.Y)),
+                                    0, 2* Math.PI, false);
+            await _context.ClosePathAsync();
+            await _context.StrokeAsync();
+        }
+
+        private async void DrawRect(IImageMap imageMap)
+        {
+            var rectCoords = imageMap.ImageMapCoordinates.OrderBy(c => c.Position).ToArray();
+            var firstVertex = rectCoords[0];
+            var secondVertex = rectCoords[1];
+            var rectWidth = firstVertex.X - secondVertex.X;
+            var rectHeight = firstVertex.Y - secondVertex.Y;
+
+            await _context.StrokeRectAsync(firstVertex.X, firstVertex.Y, -rectWidth, -rectHeight);
+        }
+
+        private async void DrawPoly(Canvas2DContext context, IImageMap imageMap)
+        {
+            var polyCoords = imageMap.ImageMapCoordinates.OrderBy(c=>c.Position).ToArray();
+
+            await context.BeginPathAsync();
+
+            for(int i = 0; i < polyCoords.Length; i++)
+            {
+                if (i == 0)
+                {
+                    await context.MoveToAsync(polyCoords[i].X, polyCoords[i].Y);
+                } else
+                {
+                    await context.LineToAsync(polyCoords[i].X, polyCoords[i].Y);
+                }
+            }
+
+            await context.ClosePathAsync();
+            await context.StrokeAsync();
+        }
+
+
+        public async void Ciao(MouseEventArgs e)
+        {
+            var x = e.OffsetX;
+            var y = e.OffsetY;
+
+            
+
+            Console.WriteLine("X="+x+"; Y="+y);
+        }
+
+        //_________________________________
+
 
         public void ManageShapeSelection(ChangeEventArgs e)
         {
@@ -85,11 +218,22 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
         //    Y = e.ClientY;
         //}
 
-        public void AddImageMapCoordinate(MouseEventArgs e)
+        public async void AddImageMapCoordinate(MouseEventArgs e)
         {   
             X = e.OffsetX;
             Y = e.OffsetY;
             Counter++;
+
+            var x = e.OffsetX;
+            var y = e.OffsetY;
+            Console.WriteLine("X=" + x + "; Y=" + y + "/ altezza=" + imageEight + " larghezza=" + imageWidth);
+
+            //if (e.OffsetX > imageWidth || e.OffsetY > imageEight)
+            //{
+            //    await JSRuntime.InvokeVoidAsync("Alert", "Perfavore seleziona punti sull'immagine");
+            //    return;
+            //}
+
             var imageMapCoordinate = new ImageMapCoordinateDTO(e.OffsetX, e.OffsetY);
             if (imageMapCoordinates.Contains(imageMapCoordinate))
             {
@@ -107,7 +251,7 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
                 {
                     var firstCoordinate = imageMapCoordinates.First();
                     if (imageMapCoordinate.X == firstCoordinate.X
-                        || imageMapCoordinate.Y == firstCoordinate.Y) //altrimenti esce un segmento
+                        || imageMapCoordinate.Y == firstCoordinate.Y) //altrimenti escirebbe un segmento
                     {
                         ShowMessage(NotValidCoordinate);
                         return;
@@ -116,6 +260,14 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
                 imageMapCoordinate.Position = imageMapCoordinates.Count + 1;
                 Console.WriteLine("coordinata aggiunta");   
                 imageMapCoordinates.AddLast(imageMapCoordinate);
+                if (imageMapCoordinates.Count == 1)
+                {
+                    DrawFirstPoint();
+                }
+                else
+                {
+                    DrawNewCircleOrRect();
+                }
             }
             else //Poly
             {
@@ -128,10 +280,130 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
                 imageMapCoordinate.Position = imageMapCoordinates.Count + 1;
                 Console.WriteLine("coordinata aggiunta -> x: " + imageMapCoordinate.X + "; y: " + imageMapCoordinate.Y);
                 imageMapCoordinates.AddLast(imageMapCoordinate);
+                if (imageMapCoordinates.Count == 1)
+                {
+                    DrawFirstPoint();
+                }
+                else
+                {
+                    DrawNewPoly();
+                }
             }
         }
 
+        //----------------------------------------------
 
+        private async void DrawFirstPoint()
+        { 
+            var firstPointX = this.imageMapCoordinates.First().X;
+            var firstPointY = this.imageMapCoordinates.First().Y;
+
+            var seconPointX = firstPointX + 3;
+
+            this._context = await this._canvasReference.CreateCanvas2DAsync();
+
+            await this._context.ClearRectAsync(1, 1, 400, 500);
+
+            await DrawCanvasAreaBordes();
+
+            await _context.DrawImageAsync(OperaImage, 0, 0);
+
+            await DrawDBImageMaps();
+
+            await _context.BeginPathAsync();
+
+            await _context.ArcAsync(firstPointX, firstPointY,
+                                    CircumferenceFinder.FindRadius(new CartesianPoint(firstPointX, firstPointY),
+                                                                   new CartesianPoint(seconPointX, firstPointY)),
+                                    0, 2 * Math.PI, false);
+
+            await _context.ClosePathAsync();
+            await _context.SetFillStyleAsync("red");
+            await _context.FillAsync();
+            await _context.StrokeAsync();
+
+        }
+
+        private async void DrawNewCircleOrRect()
+        {
+            this._context = await this._canvasReference.CreateCanvas2DAsync();
+
+            await this._context.ClearRectAsync(1, 1, 400, 500);
+
+            await DrawCanvasAreaBordes();
+
+            await _context.DrawImageAsync(OperaImage, 0, 0);
+
+            await DrawDBImageMaps();
+
+            ImageMapCoordinateDTO[] orderedCoords;
+
+            if (SelectedImageMapShape.Equals("Circle"))
+            {
+                await _context.BeginPathAsync();
+
+                orderedCoords = imageMapCoordinates.OrderBy(c => c.Position).ToArray();
+
+                var center = orderedCoords[0];
+
+                var circPoint = orderedCoords[1];
+
+                await _context.ArcAsync(center.X, center.Y,
+                                        CircumferenceFinder.FindRadius(new CartesianPoint(center.X, center.Y),
+                                                                        new CartesianPoint(circPoint.X, circPoint.Y)),
+                                        0, 2 * Math.PI, false);
+
+                await _context.StrokeAsync();
+
+                await _context.ClosePathAsync();
+            }
+            else
+            {
+                orderedCoords = imageMapCoordinates.OrderBy(c=>c.Position).ToArray();
+                var firstVertex = orderedCoords[0];
+                var secondVertex = orderedCoords[1];
+                var rectWidth = firstVertex.X - secondVertex.X;
+                var rectHeight = firstVertex.Y - secondVertex.Y;
+
+                await _context.StrokeRectAsync(firstVertex.X, firstVertex.Y, -rectWidth, -rectHeight);
+            }
+        }
+
+        private async void DrawNewPoly()
+        {
+            this._context = await this._canvasReference.CreateCanvas2DAsync();
+
+            await this._context.ClearRectAsync(1, 1, 400, 500);
+
+            await DrawCanvasAreaBordes();
+
+            await _context.DrawImageAsync(OperaImage, 0, 0);
+
+            await DrawDBImageMaps();
+
+            await _context.BeginPathAsync();
+
+            var orderedCoords = imageMapCoordinates.OrderBy(c => c.Position).ToArray();
+
+            for (int i = 0; i < orderedCoords.Length; i++)
+            {
+                if (i == 0)
+                {
+                    await _context.MoveToAsync(orderedCoords[i].X, orderedCoords[i].Y);
+                } 
+                else
+                {
+                    await _context.LineToAsync(orderedCoords[i].X, orderedCoords[i].Y);
+                }
+            }
+
+            await _context.ClosePathAsync();
+            await _context.StrokeAsync();
+
+        }
+
+
+        //___________________________________________________
 
         private bool ThereIsOverlappingInPoly(ImageMapCoordinateDTO coordinateToAdd)
         {
@@ -147,22 +419,6 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
             imageMapCoordinates.OrderBy(c => c.Position);
             List<ImageMapCoordinateDTO[]> listOfCouples = GetVertexesCouples(coordinateToAdd);
             
-            //var secondLastCouple = listOfCouples[listOfCouples.Count - 2];
-            //Console.WriteLine("Penultima Coppia -> " + "Prima coordinata - X=" + secondLastCouple[0].X + ", Y=" + secondLastCouple[0].Y + " - Seconda Coordinata: - X=" + secondLastCouple[1].X + ", Y=" + secondLastCouple[1].Y);
-            //var secondLastLine = StraightLineInTwoPointFinder
-            //                        .FindStraightLine(new CartesianPoint(secondLastCouple[0].X, secondLastCouple[0].Y),
-            //                                            new CartesianPoint(secondLastCouple[1].X, secondLastCouple[1].Y));
-            //Console.WriteLine("Retta penultima coppia -> " + "a:" + secondLastLine.a + " b:" + secondLastLine.b + " c:" + secondLastLine.c);
-
-
-            //var lastCouple = listOfCouples[listOfCouples.Count - 1];
-            //Console.WriteLine("Ultima Coppia -> " + "Prima coordinata - X=" + lastCouple[0].X + ", Y=" + lastCouple[0].Y + " - Seconda Coordinata: - X=" + lastCouple[1].X + ", Y=" + lastCouple[1].Y);
-            //var lastLine = StraightLineInTwoPointFinder
-            //                .FindStraightLine(new CartesianPoint(lastCouple[0].X, lastCouple[0].Y),
-            //                                    new CartesianPoint(lastCouple[1].X, lastCouple[1].Y));
-            //Console.WriteLine("Retta ultima coppia -> " + "a:" + lastLine.a + " b:" + lastLine.b + " c:" + lastLine.c);
-
-
             for (int i = 0; i < listOfCouples.Count - 2; i++)
             {
                 var intersectionCouple = listOfCouples[i];
@@ -243,7 +499,7 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
         }
 
         //se il terzo punto con il secondo formano la stessa retta delineata dal primo e secondo punto
-        //elimino il secondo punto
+        //elimino il secondo punto (andrebbero semplificate)
         private void ThirdPointCase(ImageMapCoordinateDTO coordinateToAdd)
         {
             var coords = imageMapCoordinates.OrderBy(c => c.Position);

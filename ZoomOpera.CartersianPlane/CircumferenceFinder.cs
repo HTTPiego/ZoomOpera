@@ -11,7 +11,7 @@
                 new ImplicitFormcCircumference(1, 1, (2 * (-center.X)), (2 * (-center.Y)), (Math.Pow(center.X, 2) + Math.Pow(center.Y, 2) - Math.Pow(radius, 2)) );
         }
 
-        private static double FindRadius(CartesianPoint center, CartesianPoint circumferencePoint)
+        public static double FindRadius(CartesianPoint center, CartesianPoint circumferencePoint)
         {
             double radius;
             if (center.X == circumferencePoint.X)

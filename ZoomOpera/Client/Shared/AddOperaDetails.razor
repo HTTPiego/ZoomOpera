@@ -4,7 +4,13 @@
 <h3>Aggiungi Descrizioni Dettagliate</h3>
 
 <div>
-    <img src="@OperaImageToDetail.Image" @onclick="AddImageMapCoordinate"/>
+
+    <img id="image" @ref=OperaImage src="@OperaImageToDetail.Image" @onclick="AddImageMapCoordinate"/>
+
+    <div @onclick="AddImageMapCoordinate">
+        <BECanvas Width="500" Height="400" @ref="_canvasReference" ></BECanvas>   
+    </div>
+
 
     <p>X: @X </p>
     <br />
