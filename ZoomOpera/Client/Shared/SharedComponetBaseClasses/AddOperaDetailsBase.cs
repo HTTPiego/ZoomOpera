@@ -257,7 +257,15 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
                         return;
                     }
                 }
-                imageMapCoordinate.Position = imageMapCoordinates.Count + 1;
+                if (imageMapCoordinates.Count == 0) 
+                {
+                    imageMapCoordinate.Position = 1;
+                }
+                else
+                {
+                    imageMapCoordinate.Position = 2;
+                }
+                
                 Console.WriteLine("coordinata aggiunta");   
                 imageMapCoordinates.AddLast(imageMapCoordinate);
                 if (imageMapCoordinates.Count == 1)
@@ -705,6 +713,8 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
                         {
                             var intersectionPoint = IntersectionFinder.IntesectionBetween(linesInImageMapToAdd[i],
                                                                                             lineDBImageMap);
+                            if (intersectionPoint == null)
+                                continue;
                             if (intersectionPoint.X >= smallerX && intersectionPoint.X <= biggerX)
                             {
                                 Console.WriteLine("overlap tra rect/poly e rect/poly");
@@ -791,7 +801,7 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
 
             ICollection<ImageMapCoordinate> vertexes = imageMap.ImageMapCoordinates;
             vertexes.OrderBy(c => c.Position);
-            if (imageMap.ImageMapShape.Equals(ImageMapShape.Rect))
+            if (imageMap.ImageMapShape.Equals("Rect"))
             {
                 vertexesCouples = GetVertexesCouples(AddTwoMissingVertexesToRect(vertexes));
             }
@@ -884,7 +894,7 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
 
             LinkedList<ImageMapCoordinateDTO> vertexes = imageMapToAdd.ImageMapCoordinates;
             vertexes.OrderBy(c => c.Position);
-            if (imageMapToAdd.ImageMapShape.Equals(ImageMapShape.Rect))
+            if (imageMapToAdd.ImageMapShape.Equals("Rect"))
             {
                 vertexesCouples = GetVertexesCouples(AddTwoMissingVertexesToRect(vertexes));
             }
@@ -910,9 +920,9 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
         {
             LinkedList<ImageMapCoordinateDTO> vertexes = new LinkedList<ImageMapCoordinateDTO>();
 
-            var firstVertex = rectVertexes.First();
+            var firstVertex = rectVertexes.OrderBy(c=>c.Position).First();
             firstVertex.Position = 1;
-            var oppositeVertex = rectVertexes.Last();
+            var oppositeVertex = rectVertexes.OrderBy(c=>c.Position).Last();
             oppositeVertex.Position = 3;
 
             var fistMissingVertex = new ImageMapCoordinateDTO(oppositeVertex.X, firstVertex.Y);
@@ -934,7 +944,7 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
         {
             List<ImageMapCoordinateDTO[]> listOfCouples = new List<ImageMapCoordinateDTO[]>();
 
-            var coordinates = imageMapsCoordinates.ToArray();
+            var coordinates = imageMapsCoordinates.OrderBy(c=>c.Position).ToArray(); //ciao
             for (int i = 0; i < coordinates.Length; i++)
             {
                 ImageMapCoordinateDTO[] couple = new ImageMapCoordinateDTO[2];

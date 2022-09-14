@@ -2,10 +2,47 @@
 {
     public static class IntersectionFinder
     {
-        public static CartesianPoint IntesectionBetween(ImplicitFormStraightLine firstLine, ImplicitFormStraightLine secondLine)
+        public static CartesianPoint? IntesectionBetween(ImplicitFormStraightLine firstLine, ImplicitFormStraightLine secondLine)
         {
-            //TODO: caso rette parallele 
+            //TODO: caso rette parallele tramite coeficente angolare
 
+            if ((firstLine.a == 0 && secondLine.a == 0)                 //Le rette sono parallele tra di loro 
+                || (firstLine.b == 0 && secondLine.b == 0))             // e all'asse X oppure Y
+                return null;                                
+
+            if (firstLine.a == 0 && secondLine.b == 0)                  //La prima retta e' parallela all'asse X 
+                return new CartesianPoint(-secondLine.c, -firstLine.c); //La seconda all'asse Y
+
+            if (firstLine.b == 0 && secondLine.a == 0)                  //La prima retta e' parallela all'asse Y 
+                return new CartesianPoint(-firstLine.c, -secondLine.c); //La seconda all'asse X
+            
+            //Solamente una delle due rette e' parallela ad uno dei due assi:
+            if (firstLine.a == 0)                            //Prima retta parallela asse X 
+            {
+                var Y = -firstLine.c;
+                var X = -((secondLine.b * Y) + secondLine.c);
+                return new CartesianPoint(X, Y);
+            } 
+            if (firstLine.b == 0)                            //Prima retta parallela asse Y
+            {
+                var X = -firstLine.c;
+                var Y = -((secondLine.a * X) + secondLine.c);
+                return new CartesianPoint(X, Y);
+            }
+            if (secondLine.a == 0)                           //Seconda retta parallela asse X
+            {
+                var Y = -secondLine.c;
+                var X = -((firstLine.b * Y) + firstLine.c);
+                return new CartesianPoint(X, Y);
+            }
+            if (secondLine.b == 0)                          //Seconda retta parallela asse Y
+            {
+                var X = -secondLine.c;
+                var Y = -((firstLine.a * X) + firstLine.c);
+                return new CartesianPoint(X, Y);
+            }
+                
+            //Tutti altri casi
             //Sistema di euqazioni
 
             //trovo x da seconda equazione ax = -by -c
