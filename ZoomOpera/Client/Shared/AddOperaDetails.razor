@@ -11,6 +11,11 @@
         <BECanvas Width="500" Height="400" @ref="_canvasReference" ></BECanvas>   
     </div>
 
+    @if(this.imageMapCoordinates.Count != 0)
+    {
+        <button class="btn-outline-info" @onclick="SvuotaCoordinate">Annulla</button>
+    }   
+
 
     <p>X: @X </p>
     <br />
@@ -28,12 +33,10 @@
             @if (shape.Equals(ImageMapShapes.First()))
             {
                 <option selected>@shape </option>
-                @*<option value="@shape" selected>  @shape </option>*@
             }
             else
             {
                 <option>@shape </option>
-                @*<option value="@shape"> @shape </option>*@
             }
        }
     </select>
@@ -42,18 +45,7 @@
     @*<button class="btn-close" @onclick="DeleteLastCoordinate">Indietro</button>*@
 </div>
 
-@if (@MaxNumberOfCoordinates.ShowMessage)
-{
-    <p class="alert">Numero massimo di coordinate per il tipo area descrizione raggiunto</p>
-}
-@if (@NotValidCoordinate.ShowMessage)
-{
-    <p class="alert">Coordinata non valida</p>
-}
-@if (@ImageMapIsNotValid.ShowMessage)
-{
-    <p class="alert">Area descrizione non valida</p>
-}
+
 
 
 <div>
@@ -71,11 +63,33 @@
     </EditForm>
 </div>
 
-@*
-    <button class="btn-primary">Area Rettangolare</button>
-    <br /> <br />
-    <button class="btn-primary">Area Circolare</button>
-    <br /> <br />
-    <button class="btn-primary">Area Disegno Libero</button>*@
+@if(this.OperaImageToDetailImageMaps.Count != 0)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Titolo</th>
+                <th>Dettagli</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var imageMap in OperaImageToDetailImageMaps)
+            {
+                <tr>
+                    <td>@imageMap.Name</td>
+                    <td>@imageMap.DetailedDescription</td>
+                    <td>
+                        <button class="btn-danger" @onclick="() => DeleteImageMap(imageMap.Id)">Elimina Descrizione Dettagliata</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p class="text-warning">Non sono presenti approfondimenti sull'opera al momento</p>
+}
 
- 
+

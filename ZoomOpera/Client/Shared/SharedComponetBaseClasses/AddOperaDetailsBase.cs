@@ -23,6 +23,9 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
         protected IService<IImageMap, ImageMapDTO> ImageMapService { get; set; }
 
         [Inject]
+        protected IService<IImageMapCoordinate, ImageMapCoordinateDTO> CoordinatesService { get; set; }
+
+        [Inject]
         public NavigationManager NavigationManager { get; set; }
 
         [Parameter]
@@ -39,7 +42,7 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
 
         public IOperaImage OperaImageToDetail { get; set; } = new OperaImage();
 
-        public IEnumerable<IImageMap> OperaImageToDetailImageMaps { get; set; } = new List<IImageMap>();
+        public List<IImageMap> OperaImageToDetailImageMaps { get; set; } = new List<IImageMap>();
 
         public string SelectedImageMapShape { get; set; } = ImageMapShape.Poly.ToString();
 
@@ -107,19 +110,13 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
         {
             if (imageMap.ImageMapShape.Equals("Circle"))
             {
-
                 DrawCircle(imageMap);
-
             } else if (imageMap.ImageMapShape.Equals("Rect"))
             {
-
                 DrawRect(imageMap);
-
             } else // Poly
             {
-
                 DrawPoly(_context, imageMap);
-
             }
         }
 
@@ -171,15 +168,7 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
         }
 
 
-        public async void Ciao(MouseEventArgs e)
-        {
-            var x = e.OffsetX;
-            var y = e.OffsetY;
-
-            
-
-            Console.WriteLine("X="+x+"; Y="+y);
-        }
+       
 
         //_________________________________
 
@@ -191,15 +180,15 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
                 imageMapCoordinates.Clear();
         }
 
-        private void ShowMessage(Message message)
-        {
-            message.ShowMessage = true;
-            Timer timer = new Timer(3000);
-            timer.Elapsed += (s, e) => OnTimerElapsed(s, e, message);
-            timer.Enabled = true;
-            timer.AutoReset = false;
-            timer.Start();
-        }
+        //private void ShowMessage(Message message)
+        //{
+        //    message.ShowMessage = true;
+        //    Timer timer = new Timer(3000);
+        //    timer.Elapsed += (s, e) => OnTimerElapsed(s, e, message);
+        //    timer.Enabled = true;
+        //    timer.AutoReset = false;
+        //    timer.Start();
+        //}
 
         private void OnTimerElapsed(object sender, ElapsedEventArgs e, Message message)
         {
@@ -212,11 +201,6 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
 
         public int Counter { get; set; } = 0;
 
-        //public void verifica(MouseEventArgs e)
-        //{
-        //    X = e.ClientX;
-        //    Y = e.ClientY;
-        //}
 
         public async void AddImageMapCoordinate(MouseEventArgs e)
         {   
@@ -228,23 +212,24 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
             var y = e.OffsetY;
             Console.WriteLine("X=" + x + "; Y=" + y + "/ altezza=" + imageEight + " larghezza=" + imageWidth);
 
-            //if (e.OffsetX > imageWidth || e.OffsetY > imageEight)
-            //{
-            //    await JSRuntime.InvokeVoidAsync("Alert", "Perfavore seleziona punti sull'immagine");
-            //    return;
-            //}
+            if (e.OffsetX > imageWidth || e.OffsetY > imageEight)
+            {
+                await JSRuntime.InvokeVoidAsync("Alert", "Perfavore seleziona punti sull'immagine");
+                return;
+            }
 
             var imageMapCoordinate = new ImageMapCoordinateDTO(e.OffsetX, e.OffsetY);
             if (imageMapCoordinates.Contains(imageMapCoordinate))
             {
-                ShowMessage(NotValidCoordinate);
+                await JSRuntime.InvokeVoidAsync("Alert", "Coordinata non valida, riprovare");
                 return;
             }
             if ( ! SelectedImageMapShape.Equals("Poly")) //Circle or Rect
             {
                 if (imageMapCoordinates.Count == 2)
                 {
-                    ShowMessage(MaxNumberOfCoordinates);
+                    await JSRuntime.
+                        InvokeVoidAsync("Alert", "Massimo numero di coordinate raggiunto, procedere a caricare la descrizione dettagliata o clicca 'Annulla'");
                     return;
                 }
                 if (SelectedImageMapShape.Equals("Rect") && imageMapCoordinates.Count != 0)
@@ -253,7 +238,7 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
                     if (imageMapCoordinate.X == firstCoordinate.X
                         || imageMapCoordinate.Y == firstCoordinate.Y) //altrimenti escirebbe un segmento
                     {
-                        ShowMessage(NotValidCoordinate);
+                        await JSRuntime.InvokeVoidAsync("Alert", "Coordinata non valida, riprovare");
                         return;
                     }
                 }
@@ -282,7 +267,7 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
                 if (ThereIsOverlappingInPoly(imageMapCoordinate))
                 {
                     Console.WriteLine("overlap");
-                    ShowMessage(NotValidCoordinate);
+                    await JSRuntime.InvokeVoidAsync("Alert", "Coordinata non valida, riprovare perfavore");
                     return;
                 }
                 imageMapCoordinate.Position = imageMapCoordinates.Count + 1;
@@ -578,6 +563,12 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
 
         public async Task AddImageMap()
         {
+            if (SelectedImageMapShape.Equals("Poly") 
+                && imageMapCoordinates.Count < 3)
+            {
+                await JSRuntime.InvokeVoidAsync("Alert", "Inserisci almeno tre punti validi per delineare correttamente un'area o clicca su 'Annulla'");
+                return;
+            }
             ImageMapToAdd.ImageMapShape = SelectedImageMapShape;
             ImageMapToAdd.OperaImageId = OperaImageToDetail.Id;
             ImageMapToAdd.ImageMapCoordinates = imageMapCoordinates;
@@ -587,12 +578,53 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
             }
             else
             {
-                ShowMessage(ImageMapIsNotValid);
+                await JSRuntime.InvokeVoidAsync("Alert", "La descrizione dettagliata si accavalla con un'altra, riprova");
             }
             OperaImageToDetail = await OperaImageService.GetEntityByfatherRelationshipId(OperaToDetailId);
-            OperaImageToDetailImageMaps = await ImageMapService.GetAllByfatherRelationshipId(OperaImageToDetail.Id);
+            await ImageMapService.GetAllByfatherRelationshipId(OperaImageToDetail.Id)
+                                    .ContinueWith(r => OperaImageToDetailImageMaps = r.Result.ToList());
             ImageMapToAdd = new ImageMapDTO();
             imageMapCoordinates.Clear();
+            ReDraw();
+        }
+
+        private async void AddCoordinatesTo(Guid idFatherImageMap)
+        {
+            foreach(var coord in imageMapCoordinates)
+            {
+                coord.ImageMapId = idFatherImageMap;
+                await CoordinatesService.AddEntity(coord);
+            }
+        }
+
+        private async void ReDraw()
+        {
+            this._context = await this._canvasReference.CreateCanvas2DAsync();
+
+            await this._context.ClearRectAsync(1, 1, 400, 500);
+
+            await DrawCanvasAreaBordes();
+
+            await _context.DrawImageAsync(OperaImage, 0, 0);
+
+            await DrawDBImageMaps();
+        }
+
+        public async Task DeleteImageMap(Guid idImageMap)
+        {
+            var deleted = await ImageMapService.DeleteEntity(idImageMap);
+            OperaImageToDetailImageMaps.Remove(deleted);
+            //await ImageMapService.GetAllByfatherRelationshipId(OperaImageToDetail.Id)
+            //                        .ContinueWith(r => OperaImageToDetailImageMaps = r.Result.ToList());
+
+            ReDraw();
+            StateHasChanged();
+        }
+
+        public void SvuotaCoordinate()
+        {
+            this.imageMapCoordinates.Clear();
+            ReDraw();
         }
 
         private bool ImageMapToAddOverlapsWithOthers()
@@ -681,7 +713,7 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
 
         private bool PolyRectOverlappingSearch()
         {
-            var operaToDetailImageMaps = OperaImageToDetail.ImageMaps;
+            //var operaToDetailImageMaps = OperaImageToDetail.ImageMaps;
 
             List<ImageMapCoordinateDTO[]> vertexesCouples;
             var linesInImageMapToAdd = GetStraightLinesFrom(this.ImageMapToAdd, out vertexesCouples);
@@ -691,7 +723,7 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
                 double biggerX;
                 double smallerX;
                 AssignBiggerSmallerX(out biggerX, out smallerX, vertexesCouples[i]);
-                foreach (ImageMap imageMap in operaToDetailImageMaps)
+                foreach (ImageMap imageMap in this.OperaImageToDetailImageMaps)
                 {
                     if (imageMap.ImageMapShape.Equals("Circle"))
                     {
@@ -971,7 +1003,8 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
             ImageMapToAdd = new ImageMapDTO();
             imageMapCoordinates = new LinkedList<ImageMapCoordinateDTO>();
             OperaImageToDetail = await OperaImageService.GetEntityByfatherRelationshipId(OperaToDetailId);
-            OperaImageToDetailImageMaps = await ImageMapService.GetAllByfatherRelationshipId(OperaImageToDetail.Id);
+            await ImageMapService.GetAllByfatherRelationshipId(OperaImageToDetail.Id).ContinueWith(r=> OperaImageToDetailImageMaps = r.Result.ToList());
+            //OperaImageToDetailImageMaps = imageMaps.ToList();
         }
 
 

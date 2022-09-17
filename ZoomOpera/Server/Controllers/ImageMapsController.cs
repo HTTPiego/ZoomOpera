@@ -87,9 +87,14 @@ namespace ZoomOpera.Server.Controllers
 
                 var addedImageMap = await _imageMapService.AddEntity(dto);
 
-                dto.ImageMapCoordinates.AsParallel().ForAll(c => 
-                                                    { c.ImageMapId = addedImageMap.Id; 
-                                                      _coordinatesService.AddEntity(c); });
+                //dto.ImageMapCoordinates.AsParallel().ForAll(c => 
+                //                                    { c.ImageMapId = addedImageMap.Id; 
+                //                                      _coordinatesService.AddEntity(c); });
+                foreach(var coord in dto.ImageMapCoordinates)
+                {
+                    coord.ImageMapId = addedImageMap.Id;
+                    await _coordinatesService.AddEntity(coord);
+                }
 
                 return Ok(addedImageMap);
             }
