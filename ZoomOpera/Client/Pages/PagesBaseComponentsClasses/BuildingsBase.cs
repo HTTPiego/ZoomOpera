@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using ZoomOpera.Client.Entities.Interfaces;
 using ZoomOpera.Client.Services.Interfaces;
+using ZoomOpera.Client.Shared;
 using ZoomOpera.Client.Utils.Interfaces;
 using ZoomOpera.DTOs;
 
@@ -30,10 +31,10 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
             return await BuidingService.GetAll();
         }
 
-        //public async void GoToAddingBuilding()
-        //{
-        //    NavigationManager.NavigateTo("/strutture/aggiungi-struttura");
-        //}
+        public async void GoToAddingBuilding()
+        {
+            NavigationManager.NavigateTo("/strutture/aggiungi-struttura");
+        }
 
         public async void GoToLevels(Guid id)
         {
@@ -57,12 +58,16 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
             Buildings.Add(addedBuilding);
         }
 
-        public async void HandleOnModifiedBuilding(object sender, IBuilding modifiedBuilding)
+      
+
+        public async void HandleOnModifiedAddedBuilding(object sender, IBuilding modifiedBuilding)
         {
             var index = Buildings.FindIndex(b => b.Id.Equals(modifiedBuilding.Id));
 
             if (index != -1)
                 Buildings[index] = modifiedBuilding;
+            else
+                Buildings.Add(modifiedBuilding);
 
         }
 
@@ -70,12 +75,14 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
         {
             var buildings = await GetBuildings();
             Buildings = buildings.ToList();
-            Handler.EventHandler += HandleOnModifiedBuilding;
+            Handler.EventHandler += HandleOnModifiedAddedBuilding;
+            //Handler.EventHandler += GestisciAggiuntaStruttura;
         }
 
         public void Dispose()
         {
-            Handler.EventHandler -= HandleOnModifiedBuilding;
+            Handler.EventHandler -= HandleOnModifiedAddedBuilding;
+            //Handler.EventHandler -= GestisciAggiuntaStruttura;
         }
     }
 }

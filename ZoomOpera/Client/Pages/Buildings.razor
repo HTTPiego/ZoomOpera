@@ -7,7 +7,13 @@
 <AuthorizeView>
     <Authorized>
         @*<button class="btn-success" onclick="@GoToAddingBuilding">Aggiungi Struttura</button>*@
-        <AddBuilding BuildingAdded="@HandleOnAddedBuilding"></AddBuilding>
+
+
+        @*<AddBuilding BuildingAdded="@HandleOnAddedBuilding"></AddBuilding>*@
+
+
+        <br />
+        <p>bottone da usare --></p> <button class="btn-success" @onclick="() => GoToAddingBuilding()">AGGIUNGI PIANO</button>
         <br>
         @if(this.Buildings.Count == 0)
         {

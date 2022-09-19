@@ -89,6 +89,15 @@ namespace ZoomOpera.Server.Controllers
             }
         }
 
+        private bool DtoIsNotValid(LevelDTO dto)
+        {
+            if (dto == null)
+                return true;
+            if (_levelService.FindFirstBy(dbLevel => 
+                    new ValueTask<bool>(dbLevel.EqualsTo(dto))).Result != null)
+                return true;
+            return false;
+        }
 
         private bool TwoEqualLeves(LevelDTO dto)
         {
@@ -104,8 +113,8 @@ namespace ZoomOpera.Server.Controllers
                 if (dto == null)
                     return BadRequest("Level is not valid");
 
-                //if (await this.LevelCanNotBeUpdated(dto, idLevel))
-                //    return BadRequest($"A similar Level has been already registered");
+                if (await this.LevelCanNotBeUpdated(dto, idLevel))
+                    return BadRequest($"A similar Level has been already registered");
 
                 var levelToUpdate = await _levelService.GetEntity(idLevel);
 
@@ -128,8 +137,8 @@ namespace ZoomOpera.Server.Controllers
         {
             var equalLevel = await this._levelService
                                     .FindFirstBy(l => new ValueTask<bool>(l.EqualsTo(dto)));
-            //if (equalLevel == null)
-            //    return true;
+            if (equalLevel == null)
+                return false;
             if (equalLevel.Id.Equals(levelId))
                 return false;
             return true;

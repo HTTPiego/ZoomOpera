@@ -11,7 +11,7 @@ namespace ZoomOpera.Shared.Entities
         [Key]
         public Guid Id { get; set; }
         public int LevelNumber { get; set; }
-        public string Planimetry { get; set; }
+        public string? Planimetry { get; set; }
         public virtual ICollection<Location> Locations { get; set; } 
         public virtual ICollection<MonitorPlatform> MonitorPlatforms { get; set; } 
 
@@ -41,7 +41,6 @@ namespace ZoomOpera.Shared.Entities
             if (dto == null)
                 return false;
             if (dto.LevelNumber != LevelNumber 
-                //|| dto.Planimetry != Planimetry 
                 || ! dto.BuildingId.Equals(BuildingId))
                 return false;
             return true;

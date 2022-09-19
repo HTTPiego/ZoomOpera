@@ -136,8 +136,8 @@ namespace ZoomOpera.Server.Controllers
                 if (DtoIsNotValid(dto))
                     return BadRequest("Building is not valid");
 
-                //if (this.BuildingCanNotBeUpdated(dto, idBuilding))
-                //    return BadRequest("A similar building has been already registered");
+                if (this.BuildingCanNotBeUpdated(dto, idBuilding))
+                    return BadRequest("A similar building has been already registered");
 
                 var buildingToUpdate = await _buildingService.GetEntity(idBuilding);
 

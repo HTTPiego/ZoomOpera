@@ -1,4 +1,5 @@
 ﻿using ZoomOpera.Client.Entities.Interfaces;
+using ZoomOpera.DTOs;
 
 namespace ZoomOpera.Client.Entities
 {
@@ -14,5 +15,13 @@ namespace ZoomOpera.Client.Entities
                    Name == building.Name &&
                    BuildingCode == building.BuildingCode;
         }
+
+        //public bool EqualsTo(BuildingDTO dto)
+        //{
+        //    if (dto.Name.Equals(this.Name) 
+        //        || dto.BuildingCode.Equals(this.BuildingCode))
+        //        return true;
+        //    return false;
+        //}
     }
 }

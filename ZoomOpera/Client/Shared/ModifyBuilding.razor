@@ -1,20 +1,27 @@
 ﻿@page "/strutture/{BuildingToModifyId:guid}/modifica-struttura"
+@page "/strutture/aggiungi-struttura"
 @attribute [Authorize(Roles = "Admin")]
 @inherits ModifyBuildingBase
 
-<h3>Modifica Struttura</h3>
-
+@if(ModifyOperation)
+{
+    <h3>Modifica Struttura</h3>
+}    
+else
+{
+    <h3>Aggiungi Struttura</h3>
+}
 
 <div>
-    <EditForm Model="@UpdatingBuilding" OnSubmit="@ModifyBuilding">
+    <EditForm Model="@ManagedBuilding" OnSubmit="@ManageRequest">
         <DataAnnotationsValidator />
          <label class="form-label" for="name">Nome Stuttura</label>
-         <InputText id="name" @bind-Value="UpdatingBuilding.Name"/>
-         <ValidationMessage For="@(() => UpdatingBuilding.Name)" />
+         <InputText id="name" @bind-Value="ManagedBuilding.Name"/>
+         <ValidationMessage For="@(() => ManagedBuilding.Name)" />
          <br />
          <label class="form-label" for="Code">Codice Struttura</label>
-         <InputText id="code" @bind-Value="UpdatingBuilding.BuildingCode"/>
-         <ValidationMessage For="@(() => UpdatingBuilding.BuildingCode)" />
+         <InputText id="code" @bind-Value="ManagedBuilding.BuildingCode"/>
+         <ValidationMessage For="@(() => ManagedBuilding.BuildingCode)" />
          <br />
          <button class="btn-primary" type="submit">Conferma</button>
     </EditForm>

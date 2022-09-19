@@ -28,7 +28,9 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
         [Parameter]
         public Guid FatherBuildingId { get; set; }
 
-        public LevelDTO UpdatingLevel { get; set; } = new LevelDTO();
+        public LevelDTO ManagedLevel { get; set; } = new LevelDTO();
+
+        public bool ModifyOperation = false;
 
         public async Task OnUploadedPlanimetry(InputFileChangeEventArgs e)
         {
@@ -37,28 +39,40 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
             var buffer = new byte[resizedImage.Size];
             await resizedImage.OpenReadStream().ReadAsync(buffer);
             var imageData = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
-            UpdatingLevel.Planimetry = imageData;
+            ManagedLevel.Planimetry = imageData;
         }
 
-        public async void ModifyLevel()
+        public async void ManageRequest()
         {
             try
             {
-                ILevel updatedLevel = await Service.UpdateEntity(UpdatingLevel, LevelToModifyId);
-                Handler.FireEvent(updatedLevel);
+                ILevel dbLevel;
+                
+                if (ModifyOperation)
+                    dbLevel = await Service.UpdateEntity(ManagedLevel, LevelToModifyId);
+                else
+                    dbLevel = await Service.AddEntity(ManagedLevel);
+
+                Handler.FireEvent(dbLevel);
                 NavigationManager.NavigateTo($"/strutture/{FatherBuildingId}/piani");
             }
             catch(Exception ex)
             {
-                await JSRuntime.InvokeVoidAsync("Alert", "Modifica non valida");
+                await JSRuntime.InvokeVoidAsync("Alert", "Operazione non valida");
             }
             
         }
 
         protected override async Task OnInitializedAsync()
         {
-            var dbLevel = await Service.GetEntity(LevelToModifyId);
-            UpdatingLevel = new LevelDTO(dbLevel.LevelNumber, dbLevel.Planimetry);
+            if (! LevelToModifyId.Equals(Guid.Empty))
+            {
+                ModifyOperation = true;
+                var dbLevel = await Service.GetEntity(LevelToModifyId);
+                ManagedLevel = new LevelDTO(dbLevel.LevelNumber, dbLevel.Planimetry);
+            }
+            ManagedLevel.BuildingId = FatherBuildingId;
+            ManagedLevel.Planimetry = String.Empty;
         }
 
     }

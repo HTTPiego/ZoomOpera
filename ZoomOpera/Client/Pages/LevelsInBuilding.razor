@@ -6,7 +6,11 @@
 <br>
 <AuthorizeView>
     <Authorized>
-        <AddLevelInBuilding LevelAdded="@HandleOnAddedLevel" FatherBuildingId="FatherBuildingId"/>
+
+        @*<AddLevelInBuilding LevelAdded="@HandleOnAddedLevel" FatherBuildingId="FatherBuildingId"/>*@
+
+        <button class="btn-success" @onclick="() => GoToAddLevel()">Aggiungi Piano</button>
+
         <br>
         @if(this.Levels.Count == 0)
         {

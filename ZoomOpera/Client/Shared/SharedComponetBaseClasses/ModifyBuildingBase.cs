@@ -24,27 +24,43 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
         [Parameter]
         public Guid BuildingToModifyId { get; set; }
 
-        public BuildingDTO UpdatingBuilding { get; set; } = new BuildingDTO();
+        public BuildingDTO ManagedBuilding { get; set; } = new BuildingDTO();
 
-        public async Task ModifyBuilding()
+        public bool ModifyOperation = false;
+
+        public async Task ManageRequest()
         {
             try
             {
-                IBuilding modifiedBuilding = await Service.UpdateEntity(UpdatingBuilding, BuildingToModifyId);
-                Handler.FireEvent(modifiedBuilding);
+                IBuilding dbBuilding;
+
+                if (ModifyOperation)
+                {
+                    dbBuilding = await Service.UpdateEntity(ManagedBuilding, BuildingToModifyId);
+                }
+                else
+                {
+                    dbBuilding = await Service.AddEntity(ManagedBuilding);
+                }
+
+                Handler.FireEvent(dbBuilding);
                 NavigationManager.NavigateTo("/strutture");
             }
             catch(Exception ex)
             {
-                await JSRuntime.InvokeVoidAsync("Alert", "Modifica non valida");
+                await JSRuntime.InvokeVoidAsync("Alert", "Operazione non valida");
             }
             
         }
 
         protected override async Task OnInitializedAsync()
         {
-            var dbBuilding = await Service.GetEntity(BuildingToModifyId);
-            UpdatingBuilding = new BuildingDTO(dbBuilding.Name, dbBuilding.BuildingCode);
+            if (! BuildingToModifyId.Equals(Guid.Empty))
+            {
+                ModifyOperation = true;
+                var dbBuilding = await Service.GetEntity(BuildingToModifyId);
+                ManagedBuilding = new BuildingDTO(dbBuilding.Name, dbBuilding.BuildingCode);
+            }
         }
     }
 }

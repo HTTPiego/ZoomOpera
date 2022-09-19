@@ -1,28 +1,37 @@
 ﻿@page "/strutture/{FatherBuildingId:guid}/piani/{LevelToModifyId:guid}/modifica-piano"
+@page "/strutture/{FatherBuildingId:guid}/piani/aggiungi-piano"
 @attribute [Authorize(Roles = "Admin")]
 @inherits ModifyLevelsinBuidingBase
 
-<h3>Modifica Piano della Struttura</h3>
+@if(ModifyOperation)
+{
+    <h3>Modifica Piano della Struttura</h3>
+}
+else
+{
+    <h3>Aggiungi Piano alla Struttura</h3>
+}
+
 
 <div>
-    <EditForm Model="@UpdatingLevel" OnSubmit="@ModifyLevel">
+    <EditForm Model="@ManagedLevel" OnSubmit="@ManageRequest">
         <DataAnnotationsValidator />
          <label class="form-label" for="number">Numero Piano</label>
-         <InputNumber id="number" @bind-Value="UpdatingLevel.LevelNumber"/>
-         <ValidationMessage For="@(() => UpdatingLevel.LevelNumber)" />
+         <InputNumber id="number" @bind-Value="ManagedLevel.LevelNumber"/>
+         <ValidationMessage For="@(() => ManagedLevel.LevelNumber)" />
          <br />
          <label class="form-label" for="planimetry">Planimetria</label>
          <InputFile OnChange="OnUploadedPlanimetry" id="planimetry" />
-         <ValidationMessage For="@(() => UpdatingLevel.Planimetry)" />
+         @*<ValidationMessage For="@(() => ManagedLevel.Planimetry)" />*@
          <p>Attuale Planimetria:</p>
-        @if (String.IsNullOrEmpty(@UpdatingLevel.Planimetry))
+        @if (String.IsNullOrEmpty(ManagedLevel.Planimetry))
         {
             <p class="text-danger">Planimetria non ancora caricata</p>
         }
         else
         {
             <div class="col-12">
-                <img src="@UpdatingLevel.Planimetry" />    
+                <img src="@ManagedLevel.Planimetry" />    
             </div>
         }
         <br /> <br />

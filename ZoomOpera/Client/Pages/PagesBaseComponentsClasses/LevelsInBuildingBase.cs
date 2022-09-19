@@ -30,6 +30,11 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
             return await Service.GetAllByfatherRelationshipId(FatherBuildingId);
         }
 
+        public void GoToAddLevel()
+        {
+            NavigationManager.NavigateTo($"/strutture/{FatherBuildingId}/piani/aggiungi-piano");
+        }
+
         public void GoToLocations(Guid id)
         {
             NavigationManager.NavigateTo($"/strutture/{FatherBuildingId}/piani/{id}/locazioni-opere");
@@ -59,12 +64,14 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
             Levels.OrderBy(l => l.LevelNumber);
         }
 
-        public void HandleOnModifiedLevel(object sender, ILevel modifiedLevel)
+        public void HandleOnModifiedAddedLevel(object sender, ILevel modifiedLevel)
         {
             var index = Levels.FindIndex(l => l.Id.Equals(modifiedLevel.Id));
 
             if (index != -1)
                 Levels[index] = modifiedLevel;
+            else
+                Levels.Add(modifiedLevel);
 
             Levels.OrderBy(l => l.LevelNumber);
         }
@@ -74,12 +81,12 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
             var levels = await GetLevels();
             Levels = levels.ToList();
             Levels.OrderBy(l => l.LevelNumber);
-            Handler.EventHandler += HandleOnModifiedLevel;
+            Handler.EventHandler += HandleOnModifiedAddedLevel;
         }
 
         public void Dispose()
         {
-            Handler.EventHandler -= HandleOnModifiedLevel;
+            Handler.EventHandler -= HandleOnModifiedAddedLevel;
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace ZoomOpera.Client.Entities.Interfaces
+﻿using ZoomOpera.DTOs;
+
+namespace ZoomOpera.Client.Entities.Interfaces
 {
     public interface IBuilding
     {
@@ -9,5 +11,7 @@
         string BuildingCode { get; set; }
         ICollection<Level> Levels { get; set; }
         bool Equals(object? obj);
+
+        //bool EqualsTo(BuildingDTO other);
     }
 }
