@@ -74,9 +74,6 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            imageWidth = await JSRuntime.InvokeAsync<int>("GetWidth");
-            imageEight = await JSRuntime.InvokeAsync<int>("GetEight");
-
             this._context = await this._canvasReference.CreateCanvas2DAsync();
 
             await this._context.DrawImageAsync(OperaImage, 0, 0);
@@ -84,6 +81,9 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
             await DrawCanvasAreaBordes();
 
             await DrawDBImageMaps();
+
+            imageWidth = await JSRuntime.InvokeAsync<int>("GetWidth");
+            imageEight = await JSRuntime.InvokeAsync<int>("GetEight");
         }
 
         private async Task DrawCanvasAreaBordes()
@@ -1000,6 +1000,8 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
 
         protected override async Task OnInitializedAsync()
         {
+            //imageWidth = await JSRuntime.InvokeAsync<int>("GetWidth");
+            //imageEight = await JSRuntime.InvokeAsync<int>("GetEight");
             ImageMapToAdd = new ImageMapDTO();
             imageMapCoordinates = new LinkedList<ImageMapCoordinateDTO>();
             OperaImageToDetail = await OperaImageService.GetEntityByfatherRelationshipId(OperaToDetailId);

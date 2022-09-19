@@ -40,23 +40,20 @@
             }
        }
     </select>
-    <p>@SelectedImageMapShape</p>
-    <br />
-    @*<button class="btn-close" @onclick="DeleteLastCoordinate">Indietro</button>*@
+
 </div>
-
-
-
 
 <div>
     <EditForm Model="@ImageMapToAdd" OnSubmit="AddImageMap">
         <DataAnnotationsValidator />
         <label class="form-label" for="title">Titolo descrizione dettagliata:</label>
+        <br />
          <InputText id="title" @bind-Value="ImageMapToAdd.Title"/>
          <ValidationMessage For="@(() => ImageMapToAdd.Title)" />
          <br />
          <label class="form-label" for="description">Descrizione:</label>
-         <InputText id="description" @bind-Value="ImageMapToAdd.DetailedDescription"/>
+         <br />
+         <InputTextArea id="description" @bind-Value="ImageMapToAdd.DetailedDescription"/>
          <ValidationMessage For="@(() => ImageMapToAdd.DetailedDescription)" />
          <br />
          <button class="btn-primary" type="submit">Aggiungi Descrizione</button>
