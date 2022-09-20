@@ -1,10 +1,9 @@
 ﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.JSInterop;
 using ZoomOpera.Client.Entities.Interfaces;
-using ZoomOpera.Client.Services;
 using ZoomOpera.Client.Services.Interfaces;
-using ZoomOpera.Client.Utils;
 using ZoomOpera.DTOs;
 
 namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
@@ -23,6 +22,9 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
 
         [Inject]
         protected ILoginService<IAdmin> Service { get; set; }
+
+        [Inject]
+        protected IJSRuntime JSRuntime { get; set; }
 
         [Parameter]
         public LoginDTO LoginCredentials { get; set; } = new LoginDTO();
@@ -45,9 +47,7 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
             }
             else
             {
-                Console.WriteLine("MALE");
-                //mostra errore 
-                //dare occhiata a "toast service"
+                await JSRuntime.InvokeVoidAsync("Alert", "Credenziali non corrette, riprova perfavore");
             }
         }
 

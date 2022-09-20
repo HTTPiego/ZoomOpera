@@ -21,7 +21,7 @@
             <label for="password">Password</label>
         </div>
         <div class="form-text">
-            <InputText id="password" @bind-Value="LoginCredentials.Password"/>
+            <InputText type="password" id="password" @bind-Value="LoginCredentials.Password"/>
         </div>
         <ValidationMessage For="@(() => LoginCredentials.Password)" />
         <br />
