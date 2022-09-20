@@ -29,6 +29,12 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
 
         public List<ILocation> Locations { get; set; } = new List<ILocation>();
 
+        public void GoAddLocation()
+        {
+            NavigationManager
+                .NavigateTo($"/strutture/{FatherBuildingId}/piani/{FatherLevelId}/locazioni-opere/aggiungi-locazione");
+        }
+
         public void GoToOpera(Guid id)
         {
             NavigationManager.NavigateTo($"/strutture/{FatherBuildingId}/piani/{FatherLevelId}/locazioni-opere/{id}/opera");

@@ -715,14 +715,14 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
         {
             //var operaToDetailImageMaps = OperaImageToDetail.ImageMaps;
 
-            List<ImageMapCoordinateDTO[]> vertexesCouples;
-            var linesInImageMapToAdd = GetStraightLinesFrom(this.ImageMapToAdd, out vertexesCouples);
+            List<ImageMapCoordinateDTO[]> vertexesCouplesImageMapToAdd;
+            var linesInImageMapToAdd = GetStraightLinesFrom(this.ImageMapToAdd, out vertexesCouplesImageMapToAdd);
 
             for (int i = 0; i < linesInImageMapToAdd.Count; i++)
             {
-                double biggerX;
-                double smallerX;
-                AssignBiggerSmallerX(out biggerX, out smallerX, vertexesCouples[i]);
+                double ImageMapToAddbiggerX;
+                double ImageMapToAddsmallerX;
+                AssignBiggerSmallerX(out ImageMapToAddbiggerX, out ImageMapToAddsmallerX, vertexesCouplesImageMapToAdd[i]);
                 foreach (ImageMap imageMap in this.OperaImageToDetailImageMaps)
                 {
                     if (imageMap.ImageMapShape.Equals("Circle"))
@@ -731,27 +731,35 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
                                                                                         GetCircleFrom(imageMap));
                         foreach (var point in intersectionPoints)
                         {
-                            if (point.X >= smallerX && point.X <= biggerX)
+                            if (point.X >= ImageMapToAddsmallerX && point.X <= ImageMapToAddbiggerX)
                             {
                                 Console.WriteLine("overlap tra rect/poly e cerchio");
                                 return true;
                             }
                         }
                     }
-                    else
+                    else    
                     {
-                        var linesInDBImageMap = GetStraightLinesFrom(imageMap);
+                        List<IImageMapCoordinate[]> vertexesCouplesDbImageMap;
+                        var linesInDBImageMap = GetStraightLines(imageMap, out vertexesCouplesDbImageMap);
+                        int index = 0;
                         foreach(var lineDBImageMap in linesInDBImageMap)
                         {
+                            double DbImageMapBiggerX;
+                            double DbImageMapSmallerX;
+                            AssignBiggerSmallerX(out DbImageMapBiggerX, out DbImageMapSmallerX, vertexesCouplesDbImageMap[index]);
+
                             var intersectionPoint = IntersectionFinder.IntesectionBetween(linesInImageMapToAdd[i],
                                                                                             lineDBImageMap);
                             if (intersectionPoint == null)
                                 continue;
-                            if (intersectionPoint.X >= smallerX && intersectionPoint.X <= biggerX)
+                            if ((intersectionPoint.X >= ImageMapToAddsmallerX && intersectionPoint.X <= ImageMapToAddbiggerX) 
+                                && (intersectionPoint.X >= DbImageMapSmallerX && intersectionPoint.X <= DbImageMapBiggerX))
                             {
                                 Console.WriteLine("overlap tra rect/poly e rect/poly");
                                 return true;
                             }
+                            index++;
                         }
                     }
                 }
@@ -795,12 +803,12 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
         }
         
 
-        private List<ImplicitFormStraightLine> GetStraightLinesFrom(IImageMap imageMap, 
+        private List<ImplicitFormStraightLine> GetStraightLines(IImageMap imageMap, 
                                                                     out List<IImageMapCoordinate[]> vertexesCouples)
         {
             List<ImplicitFormStraightLine> straightLines = new List<ImplicitFormStraightLine>();
 
-            //List<IImageMapCoordinate[]> vertexesCouples;
+            //List<IImageMapCoordinate[]> vertexesCouplesImageMapToAdd;
 
             ICollection<ImageMapCoordinate> vertexes = imageMap.ImageMapCoordinates;
 
@@ -825,11 +833,12 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
 
         }
 
-        private List<ImplicitFormStraightLine> GetStraightLinesFrom(IImageMap imageMap)
+        private List<ImplicitFormStraightLine> GetStraightLinesFrom(IImageMap imageMap, 
+                                                                    out List<IImageMapCoordinate[]> vertexesCouples)
         {
             List<ImplicitFormStraightLine> straightLines = new List<ImplicitFormStraightLine>();
 
-            List<IImageMapCoordinate[]> vertexesCouples;
+            //List<IImageMapCoordinate[]> vertexesCouples;
 
             ICollection<ImageMapCoordinate> vertexes = imageMap.ImageMapCoordinates;
             vertexes.OrderBy(c => c.Position);
@@ -922,7 +931,7 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
         {
             List<ImplicitFormStraightLine> straightLines = new List<ImplicitFormStraightLine>();
 
-            //List<ImageMapCoordinateDTO[]> vertexesCouples;
+            //List<ImageMapCoordinateDTO[]> vertexesCouplesImageMapToAdd;
 
             LinkedList<ImageMapCoordinateDTO> vertexes = imageMapToAdd.ImageMapCoordinates;
             vertexes.OrderBy(c => c.Position);
@@ -976,7 +985,7 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
         {
             List<ImageMapCoordinateDTO[]> listOfCouples = new List<ImageMapCoordinateDTO[]>();
 
-            var coordinates = imageMapsCoordinates.OrderBy(c=>c.Position).ToArray(); //ciao
+            var coordinates = imageMapsCoordinates.OrderBy(c=>c.Position).ToArray(); 
             for (int i = 0; i < coordinates.Length; i++)
             {
                 ImageMapCoordinateDTO[] couple = new ImageMapCoordinateDTO[2];
@@ -1000,12 +1009,11 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
 
         protected override async Task OnInitializedAsync()
         {
-            //imageWidth = await JSRuntime.InvokeAsync<int>("GetWidth");
-            //imageEight = await JSRuntime.InvokeAsync<int>("GetEight");
             ImageMapToAdd = new ImageMapDTO();
             imageMapCoordinates = new LinkedList<ImageMapCoordinateDTO>();
             OperaImageToDetail = await OperaImageService.GetEntityByfatherRelationshipId(OperaToDetailId);
-            await ImageMapService.GetAllByfatherRelationshipId(OperaImageToDetail.Id).ContinueWith(r=> OperaImageToDetailImageMaps = r.Result.ToList());
+            await ImageMapService.GetAllByfatherRelationshipId(OperaImageToDetail.Id)
+                                    .ContinueWith(r=> OperaImageToDetailImageMaps = r.Result.ToList());
             //OperaImageToDetailImageMaps = imageMaps.ToList();
         }
 

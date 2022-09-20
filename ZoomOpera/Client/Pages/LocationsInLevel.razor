@@ -6,7 +6,10 @@
 <br>
 <AuthorizeView>
     <Authorized>
-        <AddLocationInLevel LocationAdded="@HandleOnAddedLocation" FatherLevelId="FatherLevelId"/>
+        @*<AddLocationInLevel LocationAdded="@HandleOnAddedLocation" FatherLevelId="FatherLevelId"/>*@
+
+        <button class="btn-success" @onclick="() => GoAddLocation()">Aggiungi Locazione Opera</button>
+
         <br>
         @if(this.Locations.Count == 0)
         {

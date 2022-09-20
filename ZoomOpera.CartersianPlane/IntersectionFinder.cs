@@ -53,11 +53,14 @@
             var c1 = -secondLine.c * firstLine.a;
 
             //elimino il denominatore moltiplicando tutto per la 'a' della seconda equazione
-            firstLine.b *= secondLine.a;
-            firstLine.c *= secondLine.a;
+            //firstLine.b *= secondLine.a;
+            var firstLine_BxDenominator = firstLine.b * secondLine.a;
+            //firstLine.c *= secondLine.a;
+            var firstLine_CxDenominator = firstLine.c * secondLine.a;
 
             //trovo y dalla prima equazione
-            var y = -(firstLine.c + c1) / (firstLine.b + b1);
+            //var y = -(firstLine.c + c1) / (firstLine.b + b1);
+            var y = -(firstLine_CxDenominator + c1) / (firstLine_BxDenominator + b1);
 
             //sostituisco y nella seconda equazione e trovo x
             var x = ((-secondLine.b * y) / secondLine.a) + (-secondLine.c / secondLine.a);

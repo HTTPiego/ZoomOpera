@@ -1,21 +1,30 @@
 ﻿@page "/strutture/{FatherBuildingId:guid}/piani/{FatherLevelId:guid}/locazioni/{LocationToModifyId:guid}/modifica-locazione"
+@page "/strutture/{FatherBuildingId:guid}/piani/{FatherLevelId:guid}/locazioni-opere/aggiungi-locazione"
 @attribute [Authorize(Roles = "Admin")]
 @inherits ModifyLocationsInLevelBase
 
-<h3>Modifica Locazione Opera nel Piano</h3>
+@if(ModifyOperation)
+{
+    <h3>Modifica Locazione Opera nel Piano</h3>
+}
+else
+{
+    <h3>Aggiungi Locazione Opera nel Piano</h3>
+}
+
 
 <div>
-    <EditForm Model="@UpdatingLocation" OnSubmit="@ModifyLocation">
+    <EditForm Model="@ManagedLocation" OnSubmit="@ManageRequest">
         <DataAnnotationsValidator />
          <label class="form-label" for="code">Codice Locazione</label>
          <br />
-         <InputText id="code" @bind-Value="UpdatingLocation.LocationCode"/>
-         <ValidationMessage For="@(() => UpdatingLocation.LocationCode)" />
+        <InputText id="code" @bind-Value="ManagedLocation.LocationCode" />
+        <ValidationMessage For="@(() => ManagedLocation.LocationCode)" />
          <br />
          <label class="form-label" for="notes">Note</label>
          <br />
-         <InputTextArea id="notes" @bind-Value="UpdatingLocation.Notes"/>
-         <ValidationMessage For="@(() => UpdatingLocation.Notes)" />
+        <InputTextArea id="notes" @bind-Value="ManagedLocation.Notes" />
+        <ValidationMessage For="@(() => ManagedLocation.Notes)" />
          <br /> <br />
          <button class="btn-success" type="submit">Conferma</button>
     </EditForm>
