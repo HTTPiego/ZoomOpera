@@ -7,7 +7,10 @@
 <br>
 <AuthorizeView>
     <Authorized>
-        <AddPlatformInLevel PlatformAdded="@HandleOnAddedPlatform" FatherLevelId="FatherLevelId"/>
+        @*<AddPlatformInLevel PlatformAdded="@HandleOnAddedPlatform" FatherLevelId="FatherLevelId"/>*@
+
+        <button class="btn-success" @onclick="() => GoToAddPlatform()">Aggiungi nuova Piattaforma Monitor</button>
+
         <br>
         @if(this.MonitorPlatforms.Count == 0)
         {

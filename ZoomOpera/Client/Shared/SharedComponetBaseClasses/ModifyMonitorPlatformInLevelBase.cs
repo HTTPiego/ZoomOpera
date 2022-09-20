@@ -30,27 +30,40 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
         [Parameter]
         public Guid PlatformToModifyId { get; set; }
 
-        public MonitorPlatformDTO UpdatingPlatform { get; set; } = new MonitorPlatformDTO();
+        public MonitorPlatformDTO ManagedPlatform { get; set; } = new MonitorPlatformDTO();
 
-        public async void ModifyPlatform()
+        public bool ModifyOperation { get; set; } = false;
+
+        public async void ManageRequest()
         {
             try
             {
-                IMonitorPlatform updatedPlatform = await Service.UpdateEntity(UpdatingPlatform, PlatformToModifyId);
-                EventHandler.FireEvent(updatedPlatform);
+                IMonitorPlatform dbPlatform;
+
+                if (ModifyOperation) 
+                    dbPlatform = await Service.UpdateEntity(ManagedPlatform, PlatformToModifyId);
+                else
+                    dbPlatform = await Service.AddEntity(ManagedPlatform);
+                    
+                EventHandler.FireEvent(dbPlatform);
                 NavigationManager.NavigateTo($"/strutture/{FatherBuildingId}/piani/{FatherLevelId}/piattaforme-monitor");
             }
             catch(Exception ex)
             {
-                await JSRuntime.InvokeVoidAsync("Alert", "Modifica non valida");
+                await JSRuntime.InvokeVoidAsync("Alert", "Operazione non valida");
             }
             
         }
 
         protected override async Task OnInitializedAsync()
         {
-            IMonitorPlatform dbPlatform = await Service.GetEntity(PlatformToModifyId);
-            UpdatingPlatform = new MonitorPlatformDTO(dbPlatform.MonitorCode, dbPlatform.Name, dbPlatform.Password);
+            if (! PlatformToModifyId.Equals(Guid.Empty))
+            {
+                ModifyOperation = true;
+                IMonitorPlatform dbPlatform = await Service.GetEntity(PlatformToModifyId);
+                ManagedPlatform = new MonitorPlatformDTO(dbPlatform.MonitorCode, dbPlatform.Name, dbPlatform.Password);
+            }
+            ManagedPlatform.LevelId = FatherLevelId;
         }
     }
 }

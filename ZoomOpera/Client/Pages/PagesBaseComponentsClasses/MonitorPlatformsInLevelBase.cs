@@ -25,6 +25,11 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
 
         public List<IMonitorPlatform> MonitorPlatforms { get; set; } = new List<IMonitorPlatform>();
 
+        public void GoToAddPlatform()
+        {
+            NavigationManager.NavigateTo($"/strutture/{FatherBuildingId}/piani/{FatherLevelId}/piattaforme-monitor/aggiungi-piattaforma");
+        }
+
         public void ModifyPlatform(Guid id)
         {
             NavigationManager.NavigateTo($"/strutture/{FatherBuildingId}/piani/{FatherLevelId}/piattaforme-monitor/{id}/modifica-piattaforma");

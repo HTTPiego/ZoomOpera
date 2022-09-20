@@ -42,7 +42,7 @@ namespace ZoomOpera.Shared.Entities
         public bool ShouldSerializePassword()
         {
             // don't serialize the Manager property if an employee is their own manager
-            return false;
+            return true;
         }
 
         public override bool Equals(object? obj)

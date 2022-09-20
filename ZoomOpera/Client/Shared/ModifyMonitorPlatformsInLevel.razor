@@ -1,26 +1,27 @@
 ﻿@page "/strutture/{FatherBuildingId:guid}/piani/{FatherLevelId:guid}/piattaforme-monitor/{PlatformToModifyId:guid}/modifica-piattaforma"
+@page "/strutture/{FatherBuildingId:guid}/piani/{FatherLevelId:guid}/piattaforme-monitor/aggiungi-piattaforma"
 @attribute [Authorize(Roles = "Admin")]
 @inherits ModifyMonitorPlatformInLevelBase
 
 <h3>Modifica Piattaforma Monitor nel Piano</h3>
 
 <div>
-    <EditForm Model="@UpdatingPlatform" OnSubmit="@ModifyPlatform">
+    <EditForm Model="@ManagedPlatform" OnSubmit="@ManageRequest">
         <DataAnnotationsValidator />
          <label class="form-label" for="code">Codice Piattaform Monitor</label>
          <br />
-         <InputText id="code" @bind-Value="UpdatingPlatform.MonitorCode"/>
-         <ValidationMessage For="@(() => UpdatingPlatform.MonitorCode)" />
+         <InputText id="code" @bind-Value="ManagedPlatform.MonitorCode"/>
+         <ValidationMessage For="@(() => ManagedPlatform.MonitorCode)" />
          <br />
          <label class="form-label" for="name">Nome Credenziali</label>
          <br />
-         <InputText id="name" @bind-Value="UpdatingPlatform.Name"/>
-         <ValidationMessage For="@(() => UpdatingPlatform.Name)" />
+         <InputText id="name" @bind-Value="ManagedPlatform.Name"/>
+         <ValidationMessage For="@(() => ManagedPlatform.Name)" />
          <br />
          <label class="form-label" for="password">Password</label>
          <br />
-         <InputText id="name" @bind-Value="UpdatingPlatform.Password"/>
-         <ValidationMessage For="@(() => UpdatingPlatform.Password)" />
+         <InputText id="name" @bind-Value="ManagedPlatform.Password"/>
+         <ValidationMessage For="@(() => ManagedPlatform.Password)" />
          <br /> <br />
          <button class="btn-success" type="submit">Conferma</button>
     </EditForm>
