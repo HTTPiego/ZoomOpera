@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.JSInterop;
 using ZoomOpera.Client.Entities;
 using ZoomOpera.Client.Entities.Interfaces;
 using ZoomOpera.Client.Services.Interfaces;
@@ -21,6 +23,9 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
         [Inject]
         protected NavigationManager NavigationManager { get; set; }
 
+        [Inject]
+        protected IJSRuntime JSRuntime { get; set; }
+
         [Parameter]
         public Guid FatherBuildingId { get; set; }
 
@@ -34,10 +39,30 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
 
         public IOperaImage OperaImage { get; set; }// = new OperaImage();
 
-        public void AddDetailedDescriptions()
+
+        private int ImageWidth { get; set; }
+
+        private int ImageHeight { get; set; }
+
+        public async void AddDetailedDescriptions()
         {
-            NavigationManager.
-                NavigateTo($"/strutture/{FatherBuildingId}/piani/{FatherLevelId}/locazioni-opere/{FatherLocationId}/opera/{Opera.Id}/descrizioni-dettagliate");
+            //PRIMO
+            //var query = new Dictionary<string, string> { { "Width" , ImageWidth.ToString()}, { "Height", ImageHeight.ToString() } };
+            //NavigationManager.NavigateTo(QueryHelpers.AddQueryString($"/strutture/{FatherBuildingId:guid}/piani/{FatherLevelId:guid}/locazioni-opere/{FatherLocationId:guid}/opera/{Opera.Id:guid}/descrizioni-dettagliate", query));
+            //SECONDO
+            //ImageWidth = await JSRuntime.InvokeAsync<int>("GetWidth");
+            //ImageHeight = await JSRuntime.InvokeAsync<int>("GetHeight");
+            //NavigationManager.
+            //    NavigateTo($"/strutture/{FatherBuildingId}/piani/{FatherLevelId}/locazioni-opere/{FatherLocationId}/opera/{Opera.Id}/descrizioni-dettagliate?Width={ImageWidth}&Height={ImageHeight}");
+            //TERZO
+            ImageWidth = await JSRuntime.InvokeAsync<int>("GetWidth");
+            ImageHeight = await JSRuntime.InvokeAsync<int>("GetHeight");
+            var query = new Dictionary<string, string>
+            {
+                {"imageWidht", ImageWidth.ToString() },
+                {"imageHeight", ImageHeight.ToString() }
+            };
+            NavigationManager.NavigateTo(QueryHelpers.AddQueryString($"/strutture/{FatherBuildingId}/piani/{FatherLevelId}/locazioni-opere/{FatherLocationId}/opera/{Opera.Id}/descrizioni-dettagliate", query));
         }
 
         public void ModifyOpera()
@@ -64,6 +89,16 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
             OperaImage = await OperaImageService.GetEntityByfatherRelationshipId(Opera.Id);
             EventHandler.EventHandler += HandleOnModifiedOpera;
         }
+
+        //protected override async Task OnAfterRenderAsync(bool firstRender)
+        //{
+        //    if (firstRender)
+        //    {
+        //        ImageWidth = await JSRuntime.InvokeAsync<int>("GetWidth");
+        //        ImageHeight = await JSRuntime.InvokeAsync<int>("GetHeight");
+        //    }
+            
+        //}
 
         public void Dispose()
         {

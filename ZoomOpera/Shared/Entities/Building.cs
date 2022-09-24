@@ -13,7 +13,6 @@ namespace ZoomOpera.Shared.Entities
         public string Name { get; set; }
         public string BuildingCode { get; set; }
 
-        //public Address Address { get; set; }
         public virtual ICollection<Level> Levels { get; set; }
         public Building() { }
 

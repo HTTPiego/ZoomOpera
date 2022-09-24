@@ -18,6 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 //builder.Services.AddDbContextFactory<ZoomOperaContext>(options =>
+
 builder.Services.AddDbContext<ZoomOperaContext>(options =>
 {
     options

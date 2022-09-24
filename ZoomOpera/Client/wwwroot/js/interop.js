@@ -7,7 +7,7 @@ function GetWidth() {
     return img.clientWidth;
 };
 
-function GetEight() {
+function GetHeight() {
     var img = document.getElementById('image');
     return img.clientHeight;
 };

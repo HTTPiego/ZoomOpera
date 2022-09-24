@@ -2,6 +2,8 @@
 using Blazor.Extensions.Canvas.Canvas2D;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Primitives;
 using Microsoft.JSInterop;
 using System.Timers;
 using ZoomOpera.CartersianPlane;
@@ -68,32 +70,48 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
 
         public ElementReference OperaImage { get; set; }
 
-        public int imageWidth { get; set; }
+        public bool ViewOperaImage { get; set; } = true;
 
-        public int imageEight { get; set; }
+        //[Parameter]
+        //[SupplyParameterFromQuery]
+        public int ImageWidth { get; set; }
+
+        //[Parameter]
+        //[SupplyParameterFromQuery]
+        public int ImageHeight { get; set; }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
+
             this._context = await this._canvasReference.CreateCanvas2DAsync();
 
             await this._context.DrawImageAsync(OperaImage, 0, 0);
+            
 
             await DrawCanvasAreaBordes();
 
+
             await DrawDBImageMaps();
 
-            imageWidth = await JSRuntime.InvokeAsync<int>("GetWidth");
-            imageEight = await JSRuntime.InvokeAsync<int>("GetEight");
+            //await _context.ScaleAsync(ImageWidth, ImageHeight);
+
+            //Console.WriteLine("width ----" + image.Width + " height ----" + image.Height);
+
+            //imageWidth = await JSRuntime.InvokeAsync<int>("GetWidth", OperaImage.Id);
+            //imageEight = await JSRuntime.InvokeAsync<int>("GetEight", OperaImage.Id);
+
+
         }
 
         private async Task DrawCanvasAreaBordes()
         {
+
             await _context.BeginPathAsync();
 
             await _context.MoveToAsync(0, 0);
-            await _context.LineToAsync(0, 400);
-            await _context.LineToAsync(500, 400);
-            await _context.LineToAsync(500, 0);
+            await _context.LineToAsync(0, ImageHeight);
+            await _context.LineToAsync(ImageWidth, ImageHeight);
+            await _context.LineToAsync(ImageWidth, 0);
             await _context.ClosePathAsync();
             await _context.StrokeAsync();
         }
@@ -210,9 +228,9 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
 
             var x = e.OffsetX;
             var y = e.OffsetY;
-            Console.WriteLine("X=" + x + "; Y=" + y + "/ altezza=" + imageEight + " larghezza=" + imageWidth);
+            Console.WriteLine("X=" + x + "; Y=" + y + "/ altezza=" + ImageHeight + " larghezza=" + ImageWidth);
 
-            if (e.OffsetX > imageWidth || e.OffsetY > imageEight)
+            if (e.OffsetX > ImageWidth|| e.OffsetY > ImageHeight)
             {
                 await JSRuntime.InvokeVoidAsync("Alert", "Perfavore seleziona punti sull'immagine");
                 return;
@@ -1009,12 +1027,25 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
 
         protected override async Task OnInitializedAsync()
         {
+            var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+            StringValues wid;
+            StringValues hei;
+            if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("imageWidht", out wid))
+            {
+                ImageWidth = Int32.Parse(wid.ToString());
+            }
+            if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("imageHeight", out hei))
+            {
+                ImageHeight = Int32.Parse(hei.ToString());
+            }
+
             ImageMapToAdd = new ImageMapDTO();
             imageMapCoordinates = new LinkedList<ImageMapCoordinateDTO>();
             OperaImageToDetail = await OperaImageService.GetEntityByfatherRelationshipId(OperaToDetailId);
             await ImageMapService.GetAllByfatherRelationshipId(OperaImageToDetail.Id)
                                     .ContinueWith(r=> OperaImageToDetailImageMaps = r.Result.ToList());
             //OperaImageToDetailImageMaps = imageMaps.ToList();
+           
         }
 
 

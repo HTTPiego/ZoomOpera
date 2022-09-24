@@ -35,11 +35,11 @@ namespace ZoomOpera.Server.Controllers
 
         [HttpGet]
         [Authorize(Roles = "MonitorPlatform,Admin")]
-        public async Task<ActionResult<IEnumerable<IBuilding>>> GetAllBuildingsBy([FromQuery] Guid firteringId)
+        public async Task<ActionResult<IEnumerable<IBuilding>>> GetAllBuildingsBy([FromQuery] Guid filteringId)
         {
             try
             {
-                return Ok(await this._buildingService.FindAllBy(b => new ValueTask<bool>( b.Id.Equals(firteringId))));
+                return Ok(await this._buildingService.FindAllBy(b => new ValueTask<bool>( b.Id.Equals(filteringId))));
             }
             catch (Exception)
             {

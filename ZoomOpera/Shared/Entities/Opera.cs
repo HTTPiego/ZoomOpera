@@ -20,7 +20,6 @@ namespace ZoomOpera.Shared.Entities
 
         public string AuthorFirstName { get; set; }
         public string AuthorLastName { get; set; }
-        //public string Photo { get; set; }
 
         public virtual OperaImage Image { get; set; }
 

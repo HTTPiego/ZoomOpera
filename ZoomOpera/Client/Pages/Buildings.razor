@@ -11,9 +11,8 @@
 
         @*<AddBuilding BuildingAdded="@HandleOnAddedBuilding"></AddBuilding>*@
 
+        <button class="btn-success" @onclick="() => GoToAddingBuilding()">AGGIUNGI PIANO</button>
 
-        <br />
-        <p>bottone da usare --></p> <button class="btn-success" @onclick="() => GoToAddingBuilding()">AGGIUNGI PIANO</button>
         <br>
         @if(this.Buildings.Count == 0)
         {

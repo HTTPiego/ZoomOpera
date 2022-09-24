@@ -5,10 +5,11 @@
 
 <div>
 
-    <img id="image" @ref=OperaImage src="@OperaImageToDetail.Image" @onclick="AddImageMapCoordinate"/>
-
+    <img hidden=@ViewOperaImage id="image" @ref=OperaImage src="@OperaImageToDetail.Image" />
+    
+    
     <div @onclick="AddImageMapCoordinate">
-        <BECanvas Width="500" Height="400" @ref="_canvasReference" ></BECanvas>   
+        <BECanvas Width="@ImageWidth" Height="@ImageHeight" @ref="_canvasReference" ></BECanvas>   
     </div>
 
     @if(this.imageMapCoordinates.Count != 0)
