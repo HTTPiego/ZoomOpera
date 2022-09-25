@@ -7,7 +7,25 @@
 <p>@OperaToView.Name</p>
 <br />
 <br />
-<img src="@Image.Image" usemap="#opera"/>
+
+<img id="image" @ref=OperaImage src="@Image.Image" usemap="#opera" />
+
+<br />
+
+<p>Clicca sull'immagine per scoprirne i dettagli</p>
+
+@if(! CanvasIsOpen)
+{
+    <button class="btn-primary" @onclick="OpenCanvasAsync">Scopri Dove</button>
+}
+
+@if (CanvasIsOpen)
+{
+    <BECanvas Width="@ImageWidth" Height="@ImageHeight" @ref="_canvasReference"></BECanvas>
+    <button class="btn-close" @onclick="CloseCanvas"></button>
+}
+
+
 
 <map name="opera"> 
     @foreach(var imageMap in ImageMaps)
@@ -28,7 +46,7 @@
 {
     <ViewOperaDetails ImageMapId="@SelectedImageMapId" />
     <br /> 
-    <button class="btn-close" @onclick="ChiudiDettagli"/>
+    <button class="btn-outline-primary" @onclick="CloseDetails">Chiudi Dettagli</button>
 }
 </div>
 

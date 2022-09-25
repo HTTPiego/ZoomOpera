@@ -38,6 +38,28 @@ namespace ZoomOpera.Client.Utils
             await DrawDBImageMaps(imgmps);
         }
 
+        public async void DrawSmall(List<IImageMap> imgmps)
+        {
+            _context = await _canvasReference.CreateCanvas2DAsync();
+
+            await _context.DrawImageAsync(OperaImage, 0, 0);
+
+
+            await DrawCanvasAreaBordes();
+
+
+            await DrawDBImageMaps(imgmps);
+
+            await _context.ScaleAsync(ImageWidth / 2, ImageHeight / 2);
+        }
+
+        public async void Scale()
+        {
+            _context = await _canvasReference.CreateCanvas2DAsync();
+
+            await _context.ScaleAsync(ImageWidth/2.5, ImageHeight/2.5);
+        }
+
         private async Task DrawCanvasAreaBordes()
         {
             await _context.BeginPathAsync();

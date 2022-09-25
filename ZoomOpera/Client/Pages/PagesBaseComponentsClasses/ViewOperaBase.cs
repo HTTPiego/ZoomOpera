@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Blazor.Extensions;
+using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using ZoomOpera.Client.Entities;
 using ZoomOpera.Client.Entities.Interfaces;
 using ZoomOpera.Client.Services.Interfaces;
+using ZoomOpera.Client.Utils;
 using ZoomOpera.DTOs;
 
 namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
@@ -23,6 +26,9 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
         [Inject]
         protected IService<IImageMapCoordinate, ImageMapCoordinateDTO> CoordsService { get; set; }
 
+        [Inject]
+        protected IJSRuntime JSRuntime { get; set; }
+
         [Parameter]
         public Guid OperaToViewId { get; set; }
 
@@ -37,6 +43,18 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
         public Guid SelectedImageMapId { get; set; }
 
         public bool ReadDetails { get; set; }
+
+        public bool CanvasIsOpen { get; set; }
+
+        public ElementReference OperaImage { get; set; }
+
+        public int ImageHeight { get; set; }
+
+        public int ImageWidth { get; set; }
+
+        protected BECanvasComponent? _canvasReference;
+
+        private CanvasDrawer _canvasDrawer;
 
         public string linkDetails = string.Empty;
 
@@ -72,7 +90,22 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
             return coordToString;
         }
 
-        public void ChiudiDettagli()
+        public async Task OpenCanvasAsync()
+        {
+            CanvasIsOpen = true;
+            StateHasChanged();
+            await Task.Yield();
+            var x = _canvasReference;
+            _canvasDrawer = new CanvasDrawer(x, OperaImage, ImageHeight, ImageWidth);
+            _canvasDrawer.Draw(ImageMaps.ToList());
+        }
+
+        public void CloseCanvas()
+        {
+            CanvasIsOpen = false;
+        }
+
+        public void CloseDetails()
         {
             ReadDetails = false;
         }
@@ -89,6 +122,15 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
             ImageMaps = await ImageMapsService.GetAllByfatherRelationshipId(Image.Id);
             Coords = await GetCoordinates();
             ReadDetails = false;
+            CanvasIsOpen = false;
+
+
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            ImageHeight = await JSRuntime.InvokeAsync<int>("GetHeight");
+            ImageWidth = await JSRuntime.InvokeAsync<int>("GetWidth");
         }
 
         private async Task<List<IImageMapCoordinate>> GetCoordinates()
