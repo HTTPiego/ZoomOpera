@@ -10,6 +10,10 @@ namespace ZoomOpera.DTOs
 
         public Guid OperaId { get; set; }
 
+        public int Height { get; set; }
+
+        public int Width { get; set; }
+
         public OperaImageDTO() { }
 
         public OperaImageDTO(string image)

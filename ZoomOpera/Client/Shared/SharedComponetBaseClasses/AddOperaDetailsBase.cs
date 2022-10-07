@@ -1070,14 +1070,20 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
 
             ImageMapToAdd = new ImageMapDTO();
             imageMapCoordinates = new LinkedList<ImageMapCoordinateDTO>();
-            OperaImageToDetail = await OperaImageService.GetEntityByfatherRelationshipId(OperaToDetailId);
+            OperaImageToDetail = await OperaImageService.GetEntityByfatherRelationshipId(OperaToDetailId);//.ContinueWith(img => AssignImageDimentions(img.Result));
             await ImageMapService.GetAllByfatherRelationshipId(OperaImageToDetail.Id)
                                     .ContinueWith(r=> OperaImageToDetailImageMaps = r.Result.ToList());
             //OperaImageToDetailImageMaps = imageMaps.ToList();
             _canvasDrawer = new CanvasDrawer(_canvasReference, OperaImage, ImageHeight, ImageWidth);
+            
         }
 
-
+        IOperaImage AssignImageDimentions(IOperaImage? img)
+        {
+            this.ImageHeight = img.Height;
+            this.ImageWidth = img.Width;
+            return img;
+        }
 
     }
 }

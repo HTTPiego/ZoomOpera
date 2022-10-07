@@ -1,4 +1,5 @@
-﻿using ZoomOpera.Client.Entities.Interfaces;
+﻿using System.ComponentModel.DataAnnotations;
+using ZoomOpera.Client.Entities.Interfaces;
 
 namespace ZoomOpera.Client.Entities
 {
@@ -8,6 +9,9 @@ namespace ZoomOpera.Client.Entities
         public string Image { get; set; }
         public virtual Opera Opera { get; set; }
 
+        public int Height { get; set; }
+
+        public int Width { get; set; }
         public Guid OperaId { get; set; }
         public virtual ICollection<ImageMap> ImageMaps { get; set; }
 

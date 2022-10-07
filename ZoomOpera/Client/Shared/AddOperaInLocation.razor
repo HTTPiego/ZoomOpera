@@ -5,7 +5,7 @@
 <h3>Aggiungi Opera nella Locazione</h3>
 
 <div>
-    <img src="@OperaImageToAdd.Image"/>
+    <img id="image" src="@OperaImageToAdd.Image"/>
     <EditForm Model="@OperaToAdd" OnSubmit="AddOpera">
         <DataAnnotationsValidator />
         <label class="form-label" for="image">Immagine Opera</label> 

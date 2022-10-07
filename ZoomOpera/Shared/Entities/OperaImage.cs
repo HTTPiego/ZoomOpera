@@ -15,14 +15,20 @@ namespace ZoomOpera.Shared.Entities
         [Required]
         public virtual Opera Opera { get; set; }
 
+        public int Height { get; set; }
+
+        public int Width { get; set; }
+
         public Guid OperaId { get; set; }
         public virtual ICollection<ImageMap> ImageMaps { get; set; }
 
         public OperaImage() { }
 
-        public OperaImage(string image, Guid operaId)
+        public OperaImage(string image, int height, int width, Guid operaId)
         {
             Image = image;
+            Height = height;
+            Width = width;
             OperaId = operaId;
         }
 

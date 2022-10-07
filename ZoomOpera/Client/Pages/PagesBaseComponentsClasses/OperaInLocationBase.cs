@@ -46,15 +46,6 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
 
         public async void AddDetailedDescriptions()
         {
-            //PRIMO
-            //var query = new Dictionary<string, string> { { "Width" , ImageWidth.ToString()}, { "Height", ImageHeight.ToString() } };
-            //NavigationManager.NavigateTo(QueryHelpers.AddQueryString($"/strutture/{FatherBuildingId:guid}/piani/{FatherLevelId:guid}/locazioni-opere/{FatherLocationId:guid}/opera/{Opera.Id:guid}/descrizioni-dettagliate", query));
-            //SECONDO
-            //ImageWidth = await JSRuntime.InvokeAsync<int>("GetWidth");
-            //ImageHeight = await JSRuntime.InvokeAsync<int>("GetHeight");
-            //NavigationManager.
-            //    NavigateTo($"/strutture/{FatherBuildingId}/piani/{FatherLevelId}/locazioni-opere/{FatherLocationId}/opera/{Opera.Id}/descrizioni-dettagliate?Width={ImageWidth}&Height={ImageHeight}");
-            //TERZO
             ImageWidth = await JSRuntime.InvokeAsync<int>("GetWidth");
             ImageHeight = await JSRuntime.InvokeAsync<int>("GetHeight");
             var query = new Dictionary<string, string>
@@ -63,6 +54,8 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
                 {"imageHeight", ImageHeight.ToString() }
             };
             NavigationManager.NavigateTo(QueryHelpers.AddQueryString($"/strutture/{FatherBuildingId}/piani/{FatherLevelId}/locazioni-opere/{FatherLocationId}/opera/{Opera.Id}/descrizioni-dettagliate", query));
+            
+            //NavigationManager.NavigateTo($"/strutture/{FatherBuildingId}/piani/{FatherLevelId}/locazioni-opere/{FatherLocationId}/opera/{Opera.Id}/descrizioni-dettagliate");
         }
 
         public void ModifyOpera()

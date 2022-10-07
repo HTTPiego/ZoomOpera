@@ -1,4 +1,6 @@
-﻿namespace ZoomOpera.Client.Entities.Interfaces
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ZoomOpera.Client.Entities.Interfaces
 {
     public interface IOpera
     {

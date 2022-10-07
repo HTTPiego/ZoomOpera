@@ -1,4 +1,5 @@
-﻿using ZoomOpera.DTOs;
+﻿using System.ComponentModel.DataAnnotations;
+using ZoomOpera.DTOs;
 
 namespace ZoomOpera.Shared.Entities.Interfaces
 {
@@ -8,6 +9,9 @@ namespace ZoomOpera.Shared.Entities.Interfaces
 
         string Image { get; set; }
 
+        public int Height { get; set; }
+
+        public int Width { get; set; }
         Opera Opera { get; set; }
 
         Guid OperaId { get; set; }

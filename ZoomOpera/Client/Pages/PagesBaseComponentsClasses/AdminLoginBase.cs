@@ -26,7 +26,7 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
         [Inject]
         protected IJSRuntime JSRuntime { get; set; }
 
-        [Parameter]
+        
         public LoginDTO LoginCredentials { get; set; } = new LoginDTO();
 
         //public AdminLoginBase(ILocalStorageService localStorage) 

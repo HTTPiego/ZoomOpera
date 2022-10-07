@@ -17,28 +17,32 @@
                 return new CartesianPoint(-firstLine.c, -secondLine.c); //La seconda all'asse X
             
             //Solamente una delle due rette e' parallela ad uno dei due assi:
-            if (firstLine.a == 0)                            //Prima retta parallela asse X 
+            if (firstLine.a == 0)                            //Prima retta parallela asse X - A
             {
                 var Y = -firstLine.c;
-                var X = -((secondLine.b * Y) + secondLine.c);
+                var X = -((secondLine.b * Y) + secondLine.c)/secondLine.a;
+                Console.WriteLine("A");
                 return new CartesianPoint(X, Y);
             } 
-            if (firstLine.b == 0)                            //Prima retta parallela asse Y
+            if (firstLine.b == 0)                            //Prima retta parallela asse Y - B
             {
                 var X = -firstLine.c;
-                var Y = -((secondLine.a * X) + secondLine.c);
+                var Y = -((secondLine.a * X) + secondLine.c)/secondLine.b;
+                Console.WriteLine("B");
                 return new CartesianPoint(X, Y);
             }
-            if (secondLine.a == 0)                           //Seconda retta parallela asse X
+            if (secondLine.a == 0)                           //Seconda retta parallela asse X - C
             {
                 var Y = -secondLine.c;
-                var X = -((firstLine.b * Y) + firstLine.c);
+                var X = -((firstLine.b * Y) + firstLine.c)/firstLine.a;
+                Console.WriteLine("C");
                 return new CartesianPoint(X, Y);
             }
-            if (secondLine.b == 0)                          //Seconda retta parallela asse Y
+            if (secondLine.b == 0)                          //Seconda retta parallela asse Y - D
             {
                 var X = -secondLine.c;
-                var Y = -((firstLine.a * X) + firstLine.c);
+                var Y = -((firstLine.a * X) + firstLine.c)/firstLine.b;
+                Console.WriteLine("D");
                 return new CartesianPoint(X, Y);
             }
                 

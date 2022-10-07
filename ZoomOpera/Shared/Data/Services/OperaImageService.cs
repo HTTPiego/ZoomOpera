@@ -20,7 +20,7 @@ namespace ZoomOpera.Shared.Data.Services
 
         public async Task<IOperaImage> AddEntity(OperaImageDTO dto)
         {
-            var operaImage = new OperaImage(dto.Image, dto.OperaId);
+            var operaImage = new OperaImage(dto.Image, dto.Height, dto.Width, dto.OperaId);
 
             var added = await _operaImages.AddAsync(operaImage);
             await _context.SaveChangesAsync();

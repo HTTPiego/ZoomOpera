@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
+using System.Collections.ObjectModel;
+using System.Drawing;
 using ZoomOpera.Client.Entities.Interfaces;
 using ZoomOpera.Client.Services.Interfaces;
 using ZoomOpera.Client.Utils.Interfaces;
@@ -35,6 +37,10 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
 
         public OperaImageDTO OperaImageToAdd { get; set; } = new OperaImageDTO();
 
+        private int ImageWidth;
+
+        private int ImageHeight;
+
         public async Task OnUploadedOperaImage(InputFileChangeEventArgs e)
         {
             var format = "image/png";
@@ -44,6 +50,7 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
             var imageData = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
             OperaImageToAdd.Image = imageData;
         }
+
 
         public async void AddOpera()
         {
