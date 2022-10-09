@@ -52,7 +52,7 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
 
         public bool ReadDetails { get; set; }
 
-        public bool CanvasIsOpen { get; set; }
+        //public bool CanvasIsOpen { get; set; }
 
         public ElementReference OperaImage { get; set; }
 
@@ -69,6 +69,7 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
         public bool HideOperaImage { get; set; }
 
         public bool ScopriDove { get; set; }
+
 
         public void OnReadDetails(Guid imageMapId)
         {
@@ -104,15 +105,50 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
 
         public void OpenDetails(MouseEventArgs e)
         {
+            if (ReadDetails)
+                return;
             var selectedImgMap = ClickIsInsideImgMap(e);
             if (selectedImgMap != null)
             {
                 SelectedImageMapId = selectedImgMap.Id;
                 ReadDetails = true;
-                _canvasDrawer = new CanvasDrawer(_canvasReference, OperaImage, ImageHeight, ImageWidth);
-                _canvasDrawer.ZoomOnPoint(new CartesianPoint(e.OffsetX, e.OffsetY));
+                StateHasChanged();
+                _canvasDrawer.ZoomOnPoint(new CartesianPoint(e.OffsetX, e.OffsetY), ImageHeight, ImageWidth);
             }
         }
+
+        public void ShowAreas()
+        {
+            ScopriDove = true;
+            StateHasChanged();
+            //_canvasDrawer = new CanvasDrawer(_canvasReference, OperaImage);
+            _canvasDrawer.Draw(this.ImageMaps, ImageHeight, ImageWidth);
+        }
+
+        public void CancelAreas()
+        {
+            ScopriDove = false;
+            StateHasChanged();
+            //_canvasDrawer = new CanvasDrawer(_canvasReference, OperaImage);
+            _canvasDrawer.DrawJustImage(ImageHeight, ImageWidth);
+        }
+
+        //public void CloseCanvas()
+        //{
+        //    CanvasIsOpen = false;
+        //}
+
+        public void CloseDetails()
+        {
+            ReadDetails = false;
+            if (ScopriDove)
+                ScopriDove = false;
+            StateHasChanged();
+            _canvasDrawer = new CanvasDrawer(_canvasReference, OperaImage);
+            _canvasDrawer.DrawJustImage(ImageHeight, ImageWidth);
+        }
+
+        
 
         private IImageMap? ClickIsInsideImgMap(MouseEventArgs e)
         {
@@ -281,39 +317,17 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
 
         }
 
-        public async Task OpenCanvasAsync()
-        {
-            CanvasIsOpen = true;
-            StateHasChanged();
-            await Task.Yield();
-            var x = _canvasReference;
-            _canvasDrawer = new CanvasDrawer(x, OperaImage, ImageHeight, ImageWidth);
-            _canvasDrawer.Draw(ImageMaps.ToList());
-        }
+        //public async Task OpenCanvasAsync()
+        //{
+        //    CanvasIsOpen = true;
+        //    StateHasChanged();
+        //    await Task.Yield();
+        //    var x = _canvasReference;
+        //    _canvasDrawer = new CanvasDrawer(x, OperaImage);
+        //    _canvasDrawer.Draw(ImageMaps.ToList(), ImageHeight, ImageWidth);
+        //}
 
-        public void ShowAreas()
-        {
-            ScopriDove = true;
-            _canvasDrawer = new CanvasDrawer(_canvasReference, OperaImage, 500, 500);
-            _canvasDrawer.Draw(this.ImageMaps);
-        }
-
-        public void CancelAreas()
-        {
-            ScopriDove = false;
-            _canvasDrawer = new CanvasDrawer(_canvasReference, OperaImage, 500, 500);
-            _canvasDrawer.DrawJustImage();
-        }
-
-        public void CloseCanvas()
-        {
-            CanvasIsOpen = false;
-        }
-
-        public void CloseDetails()
-        {
-            ReadDetails = false;
-        }
+        
 
         //public void ReadDetailedOperaDescription(Guid imageMapId)
         //{
@@ -327,21 +341,28 @@ namespace ZoomOpera.Client.Pages.PagesBaseComponentsClasses
             ImageMaps = await ImageMapsService.GetAllByfatherRelationshipId(Image.Id)
                                                 .ContinueWith(imgmaps => ImageMaps = imgmaps.Result.ToList());
             Coords = await GetCoordinates();
-            ReadDetails = false;
-            CanvasIsOpen = false;
+            ReadDetails = false; 
+            //CanvasIsOpen = false;
             HideOperaImage = true;
             ScopriDove = false;
 
-        //ImageHeight = await JSRuntime.InvokeAsync<int>("GetHeight");
-        //ImageWidth = await JSRuntime.InvokeAsync<int>("GetWidth");
+            _canvasDrawer = new CanvasDrawer(_canvasReference, OperaImage);
+
+            ImageHeight = Image.Height;
+            ImageWidth = Image.Width;
+            Console.WriteLine("altezza --> " + ImageHeight);
+
+            //ImageHeight = await JSRuntime.InvokeAsync<int>("GetHeight");
+            //ImageWidth = await JSRuntime.InvokeAsync<int>("GetWidth");
 
         }   
 
-        protected override void OnAfterRender(bool firstRender)
+        protected async override Task OnAfterRenderAsync(bool firstRender)
         {
-            //var x = _canvasReference;
-            _canvasDrawer = new CanvasDrawer(_canvasReference, OperaImage, 500, 500);
-            _canvasDrawer.DrawJustImage();
+            if (firstRender)
+                _canvasDrawer = new CanvasDrawer(_canvasReference, OperaImage);
+            _canvasDrawer.DrawJustImage(ImageHeight, ImageWidth);
+            
             //ImageHeight = await JSRuntime.InvokeAsync<int>("GetHeight");
             //ImageWidth = await JSRuntime.InvokeAsync<int>("GetWidth");
         }

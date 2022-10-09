@@ -96,31 +96,31 @@ namespace ZoomOpera.Server.Controllers
             return _service.FindFirstBy(i => new ValueTask<bool>(i.OperaId.Equals(dto.OperaId))) != null;
         }
 
-        //[HttpPut("{operaImageId}")]
-        //[Authorize(Roles = "Admin")]
-        //public async Task<ActionResult<IOperaImage>> UpdateOperaImage([FromBody] OperaImageDTO dto, Guid operaImageId)
-        //{
-        //    try
-        //    {
-        //        if (dto == null ||  dto.Image == null)
-        //            return BadRequest("Opera's Image is not valid");
+        [HttpPut("{operaImageId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<IOperaImage>> UpdateOperaImage([FromBody] OperaImageDTO dto, Guid operaImageId)
+        {
+            try
+            {
+                if (dto == null || dto.Image == null)
+                    return BadRequest("Opera's Image is not valid");
 
-        //        var operaImageToUpdate = await _service.GetEntity(operaImageId);
+                var operaImageToUpdate = await _service.GetEntity(operaImageId);
 
-        //        if (operaImageToUpdate == null)
-        //            return NotFound($"Opera's Image with Id = {operaImageId} not found");
+                if (operaImageToUpdate == null)
+                    return NotFound($"Opera's Image with Id = {operaImageId} not found");
 
-        //        if (!operaImageToUpdate.Id.Equals(operaImageId))
-        //            return BadRequest("IDs don't correspond");
+                if (!operaImageToUpdate.Id.Equals(operaImageId))
+                    return BadRequest("IDs don't correspond");
 
-        //        return Ok(await _service.UpdateEntity(dto, operaImageToUpdate));
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return StatusCode(StatusCodes.Status500InternalServerError,
-        //            "Error updating data");
-        //    }
-        //}
+                return Ok(await _service.UpdateEntity(dto, operaImageToUpdate));
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error updating data");
+            }
+        }
 
         //[HttpDelete("{operaImageId}")]
         //[Authorize(Roles = "Admin")]

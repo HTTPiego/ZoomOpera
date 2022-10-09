@@ -6,6 +6,7 @@ using ZoomOpera.Client.Entities.Interfaces;
 using ZoomOpera.CartersianPlane;
 using ZoomOpera.DTOs;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace ZoomOpera.Client.Utils
 {
@@ -16,86 +17,90 @@ namespace ZoomOpera.Client.Utils
         private ElementReference OperaImage;
         private int ImageHeight;
         private int ImageWidth;
+        //private CartesianPoint _origin;
+        //private int currentScale;
 
-        public CanvasDrawer(BECanvasComponent canvasReference, ElementReference operaImage, int imageHeight, int imageWidth)
+        public CanvasDrawer(BECanvasComponent canvasReference, ElementReference operaImage)//, int imageHeight, int imageWidth)
         {
             _canvasReference = canvasReference;
             OperaImage = operaImage;
-            ImageHeight = imageHeight;
-            ImageWidth = imageWidth;
+            //_origin = new CartesianPoint(0, 0);
+            //currentScale = 1;
+            //ImageHeight = imageHeight;
+            //ImageWidth = imageWidth;
         }
 
-        public async void Draw(List<IImageMap> imgmps)
+        public async void Draw(List<IImageMap> imgmps, int imageHeight, int imageWidth)
         {
             _context = await _canvasReference.CreateCanvas2DAsync();
+
+            await DrawCanvasAreaBordes(imageHeight, imageWidth);
+
 
             await _context.DrawImageAsync(OperaImage, 0, 0);
 
 
-            await DrawCanvasAreaBordes();
+            await DrawCanvasAreaBordes(225, 300);
 
 
-            await DrawDBImageMaps(imgmps);
+            DrawDBImageMaps(imgmps);
+
         }
 
-        public async void ZoomOnPoint(CartesianPoint point)
+        public async void ZoomOnPoint(CartesianPoint point, int imageHeight, int imageWidth)
         {
+
             _context = await _canvasReference.CreateCanvas2DAsync();
 
-            await _context.DrawImageAsync(OperaImage, 0, 0);
+            await DrawCanvasAreaBordes(imageHeight, imageWidth);
+
+            await _context.SaveAsync();
 
             await _context.TranslateAsync(point.X, point.Y);
 
-            await _context.ScaleAsync(2, 2);
+            await _context.ScaleAsync(3, 3);
+
+            await _context.DrawImageAsync(OperaImage, -point.X, -point.Y);
+
+            
+
+            await _context.RestoreAsync();
         }
 
-        public async void DrawJustImage()
+
+        public async void DrawJustImage(int imageHeight, int imageWidth)
         {
             _context = await _canvasReference.CreateCanvas2DAsync();
+
+            //await _context.RestoreAsync();
+
+            //await _context.ClearRectAsync(0,0,imageWidth, imageHeight);  
 
             await _context.DrawImageAsync(OperaImage, 0, 0);
 
 
-            await DrawCanvasAreaBordes();
+            await DrawCanvasAreaBordes(imageHeight, imageWidth);
 
+            //await _context.SaveAsync();
         }
 
-        public async void DrawSmall(List<IImageMap> imgmps)
-        {
-            _context = await _canvasReference.CreateCanvas2DAsync();
-
-            await _context.DrawImageAsync(OperaImage, 0, 0);
 
 
-            await DrawCanvasAreaBordes();
-
-
-            await DrawDBImageMaps(imgmps);
-
-            await _context.ScaleAsync(ImageWidth / 2, ImageHeight / 2);
-        }
-
-        public async void Scale()
-        {
-            _context = await _canvasReference.CreateCanvas2DAsync();
-
-            await _context.ScaleAsync(ImageWidth/2.5, ImageHeight/2.5);
-        }
-
-        private async Task DrawCanvasAreaBordes()
+        private async Task DrawCanvasAreaBordes(int imageHeight, int imageWidth)
         {
             await _context.BeginPathAsync();
 
             await _context.MoveToAsync(0, 0);
-            await _context.LineToAsync(0, ImageHeight);
-            await _context.LineToAsync(ImageWidth, ImageHeight);
-            await _context.LineToAsync(ImageWidth, 0);
+            await _context.LineToAsync(0, imageHeight);
+            await _context.LineToAsync(imageWidth, imageHeight);
+            await _context.LineToAsync(imageWidth, 0);
             await _context.ClosePathAsync();
             await _context.StrokeAsync();
         }
 
-        private async Task DrawDBImageMaps(List<IImageMap> imgmps)
+        private void DrawDBImageMaps(List<IImageMap> imgmps)
         {
+            //await _context.BeginPathAsync();
             foreach (var imageMap in imgmps)
             {
                 DrawImageMap(imageMap);
@@ -166,22 +171,23 @@ namespace ZoomOpera.Client.Utils
             await _context.StrokeAsync();
         }
 
-        public async void DrawFirstPoint(Double x, Double y, List<IImageMap> imgmps)
+        public async void DrawFirstPoint(double x, double y, List<IImageMap> imgmps, int imageHeight, int imageWidth)
         {
             var firstPointX = x;
             var firstPointY = y;
 
             var seconPointX = firstPointX + 3;
 
-            _context = await this._canvasReference.CreateCanvas2DAsync();
+            await _context.ClearRectAsync(0, 0, imageWidth, imageHeight);
 
-            await _context.ClearRectAsync(1, 1, ImageWidth, ImageHeight);
+            _context = await _canvasReference.CreateCanvas2DAsync();
 
-            await DrawCanvasAreaBordes();
+            //await _context.ClearRectAsync(0, 0, imageWidth, imageHeight);
 
             await _context.DrawImageAsync(OperaImage, 0, 0);
 
-            await DrawDBImageMaps(imgmps);
+            DrawDBImageMaps(imgmps);
+
 
             await _context.BeginPathAsync();
 
@@ -195,19 +201,26 @@ namespace ZoomOpera.Client.Utils
             await _context.FillAsync();
             await _context.StrokeAsync();
 
+            await Task.WhenAll(new Task(() => Console.WriteLine("ciao")));
         }
 
-        public async void DrawNewCircleOrRect(String SelectedImageMapShape, List<IImageMap> imgmps, LinkedList<ImageMapCoordinateDTO> coords)
+        public async void DrawNewCircleOrRect(string SelectedImageMapShape, 
+                                                List<IImageMap> imgmps, 
+                                                LinkedList<ImageMapCoordinateDTO> coords,
+                                                int imageHeight, int imageWidth)
         {
+
+            await _context.ClearRectAsync(0, 0, imageWidth, imageHeight);
+
             _context = await this._canvasReference.CreateCanvas2DAsync();
 
-            await _context.ClearRectAsync(1, 1, ImageWidth, ImageHeight);
+            await _context.ClearRectAsync(1, 1, imageWidth, imageHeight);
 
-            await DrawCanvasAreaBordes();
+            await DrawCanvasAreaBordes(imageHeight, imageWidth);
 
             await _context.DrawImageAsync(OperaImage, 0, 0);
 
-            await DrawDBImageMaps(imgmps);
+            DrawDBImageMaps(imgmps);
 
             ImageMapCoordinateDTO[] orderedCoords;
 
@@ -242,17 +255,21 @@ namespace ZoomOpera.Client.Utils
             }
         }
 
-        public async void DrawNewPoly(List<IImageMap> imgmps, LinkedList<ImageMapCoordinateDTO> coords)
+        public async void DrawNewPoly(List<IImageMap> imgmps, 
+                                        LinkedList<ImageMapCoordinateDTO> coords,
+                                        int imageHeight, int imageWidth)
         {
+            await _context.ClearRectAsync(0, 0, imageWidth, imageHeight);
+
             _context = await this._canvasReference.CreateCanvas2DAsync();
 
-            await _context.ClearRectAsync(1, 1, ImageWidth, ImageHeight);
+            await _context.ClearRectAsync(1, 1, imageWidth, imageHeight);
 
-            await DrawCanvasAreaBordes();
+            await DrawCanvasAreaBordes(imageHeight, imageWidth);
 
             await _context.DrawImageAsync(OperaImage, 0, 0);
 
-            await DrawDBImageMaps(imgmps);
+            DrawDBImageMaps(imgmps);
 
             await _context.BeginPathAsync();
 

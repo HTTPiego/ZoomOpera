@@ -76,7 +76,7 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
                                               dbOpera.AuthorLastName);
 
             IOperaImage dbOperaImage = await OperaImageService.GetEntityByfatherRelationshipId(dbOpera.Id);
-            OperaImageToModify = new OperaImageDTO(dbOperaImage.Image);
+            OperaImageToModify = new OperaImageDTO(dbOperaImage.Image, 0, 0);
         }
     }
 }

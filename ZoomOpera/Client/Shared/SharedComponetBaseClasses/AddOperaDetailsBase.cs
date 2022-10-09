@@ -107,20 +107,9 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
         {
             if (firstRender)
             {
-                _canvasDrawer = new CanvasDrawer(_canvasReference, OperaImage, ImageHeight, ImageWidth);
+                _canvasDrawer = new CanvasDrawer(_canvasReference, OperaImage);
             }
-            _canvasDrawer.Draw(OperaImageToDetailImageMaps);
-
-            //this._context = await this._canvasReference.CreateCanvas2DAsync();
-
-            //await this._context.DrawImageAsync(OperaImage, 0, 0);
-            
-
-            //await DrawCanvasAreaBordes();
-
-
-            //await DrawDBImageMaps();
-
+            _canvasDrawer.Draw(OperaImageToDetailImageMaps, ImageHeight, ImageWidth);
 
 
         }
@@ -254,7 +243,6 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
 
             if (e.OffsetX > ImageWidth|| e.OffsetY > ImageHeight)
             {
-                await JSRuntime.InvokeVoidAsync("Alert", "Perfavore seleziona punti sull'immagine");
                 return;
             }
 
@@ -295,12 +283,13 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
                 imageMapCoordinates.AddLast(imageMapCoordinate);
                 if (imageMapCoordinates.Count == 1)
                 {
-                    _canvasDrawer.DrawFirstPoint(imageMapCoordinates.First().X, imageMapCoordinates.First().Y, OperaImageToDetailImageMaps);
+                    Console.WriteLine("ALTEZZA -->" + ImageHeight);
+                    _canvasDrawer.DrawFirstPoint(imageMapCoordinates.First().X, imageMapCoordinates.First().Y, OperaImageToDetailImageMaps, ImageHeight, ImageWidth);
                     //DrawFirstPoint();
                 }
                 else
                 {
-                    _canvasDrawer.DrawNewCircleOrRect(SelectedImageMapShape, OperaImageToDetailImageMaps, imageMapCoordinates);
+                    _canvasDrawer.DrawNewCircleOrRect(SelectedImageMapShape, OperaImageToDetailImageMaps, imageMapCoordinates, ImageHeight, ImageWidth);
                     //DrawNewCircleOrRect();
                 }
             }
@@ -317,12 +306,13 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
                 imageMapCoordinates.AddLast(imageMapCoordinate);
                 if (imageMapCoordinates.Count == 1)
                 {
-                    _canvasDrawer.DrawFirstPoint(imageMapCoordinates.First().X, imageMapCoordinates.First().Y, OperaImageToDetailImageMaps);
+                    Console.WriteLine("coordinata in lista -> x: " + imageMapCoordinates.First().X + "; y: " + imageMapCoordinates.First().Y);
+                    _canvasDrawer.DrawFirstPoint(imageMapCoordinates.First().X, imageMapCoordinates.First().Y, OperaImageToDetailImageMaps, ImageHeight, ImageWidth);
                     //DrawFirstPoint();
-                }
+                }   
                 else
                 {
-                    _canvasDrawer.DrawNewPoly(OperaImageToDetailImageMaps, imageMapCoordinates);
+                    _canvasDrawer.DrawNewPoly(OperaImageToDetailImageMaps, imageMapCoordinates, ImageHeight, ImageWidth);
                     //DrawNewPoly();
                 }
             }
@@ -629,7 +619,7 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
                                     .ContinueWith(r => OperaImageToDetailImageMaps = r.Result.ToList());
             ImageMapToAdd = new ImageMapDTO();
             imageMapCoordinates.Clear();
-            _canvasDrawer.Draw(OperaImageToDetailImageMaps);
+            _canvasDrawer.Draw(OperaImageToDetailImageMaps, ImageHeight, ImageWidth);
             //ReDraw();
         }
 
@@ -662,7 +652,7 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
             //await ImageMapService.GetAllByfatherRelationshipId(OperaImageToDetail.Id)
             //                        .ContinueWith(r => OperaImageToDetailImageMaps = r.Result.ToList());
 
-            _canvasDrawer.Draw(OperaImageToDetailImageMaps);
+            _canvasDrawer.Draw(OperaImageToDetailImageMaps, ImageHeight, ImageWidth);
             //ReDraw();
             StateHasChanged();
         }
@@ -670,7 +660,7 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
         public void SvuotaCoordinate()
         {
             this.imageMapCoordinates.Clear();
-            _canvasDrawer.Draw(OperaImageToDetailImageMaps);
+            _canvasDrawer.Draw(OperaImageToDetailImageMaps, ImageHeight, ImageWidth);
             //ReDraw();
         }
 
@@ -1071,19 +1061,14 @@ namespace ZoomOpera.Client.Shared.SharedComponetBaseClasses
             ImageMapToAdd = new ImageMapDTO();
             imageMapCoordinates = new LinkedList<ImageMapCoordinateDTO>();
             OperaImageToDetail = await OperaImageService.GetEntityByfatherRelationshipId(OperaToDetailId);//.ContinueWith(img => AssignImageDimentions(img.Result));
+            await OperaImageService.UpdateEntity(new OperaImageDTO(OperaImageToDetail.Image, ImageHeight, ImageWidth), OperaImageToDetail.Id);
             await ImageMapService.GetAllByfatherRelationshipId(OperaImageToDetail.Id)
                                     .ContinueWith(r=> OperaImageToDetailImageMaps = r.Result.ToList());
             //OperaImageToDetailImageMaps = imageMaps.ToList();
-            _canvasDrawer = new CanvasDrawer(_canvasReference, OperaImage, ImageHeight, ImageWidth);
+            //_canvasDrawer = new CanvasDrawer(_canvasReference, OperaImage);
             
         }
 
-        IOperaImage AssignImageDimentions(IOperaImage? img)
-        {
-            this.ImageHeight = img.Height;
-            this.ImageWidth = img.Width;
-            return img;
-        }
 
     }
 }

@@ -50,9 +50,8 @@ namespace ZoomOpera.Client.Services
 
         public async Task<IOperaImage?> UpdateEntity(OperaImageDTO updatingDTO, Guid idEntity)
         {
-            throw new NotImplementedException();
-            //var response = await this._httpClient.PutAsJsonAsync($"https://localhost:7288/api/OperaImages/{idEntity}", updatingDTO);
-            //return await response.Content.ReadFromJsonAsync<OperaImage>();
+            var response = await this._httpClient.PutAsJsonAsync($"https://localhost:7288/api/OperaImages/{idEntity}", updatingDTO);
+            return await response.Content.ReadFromJsonAsync<OperaImage>();
         }
     }
 }

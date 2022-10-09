@@ -58,6 +58,8 @@ namespace ZoomOpera.Shared.Data.Services
         public async Task<IOperaImage> UpdateEntity(OperaImageDTO updatingDTO, IOperaImage dbEntity)
         {
             dbEntity.Image = updatingDTO.Image;
+            dbEntity.Width = updatingDTO.Width;
+            dbEntity.Height = updatingDTO.Height;
 
             await _context.SaveChangesAsync();
 

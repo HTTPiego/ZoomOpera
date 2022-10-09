@@ -14,21 +14,21 @@
 
 
 <div @onclick="OpenDetails">
-    <BECanvas Width="500" Height="500" @ref="_canvasReference"></BECanvas>
+    <BECanvas Width="ImageWidth" Height="ImageHeight" @ref="_canvasReference"></BECanvas>
 </div>
 
 <br />
 
 <p>Clicca sull'immagine per scoprirne i dettagli</p>
 
-@if(!@ScopriDove)
+@if(!ScopriDove && !ReadDetails)
 {
     <button class="btn-primary" @onclick="ShowAreas">Scopri le aree selezionabili</button>
 }
 
-@if (@ScopriDove)
+@if (ScopriDove && !ReadDetails)
 {
-    <button class="btn-outline-primary" @onclick="CancelAreas">Cancella le aree</button>
+    <button class="btn-outline-primary" @onclick="CancelAreas">Indietro</button>
 }
 
 @*@if(! CanvasIsOpen)
@@ -40,9 +40,7 @@
 {
     <BECanvas Width="@ImageWidth" Height="@ImageHeight" @ref="_canvasReference"></BECanvas>
     <button class="btn-close" @onclick="CloseCanvas"></button>
-}*@
-
-
+}
 
 <map name="opera"> 
     @foreach(var imageMap in ImageMaps)
@@ -54,7 +52,7 @@
               target="_blank"
         />
     }
-</map>
+</map>*@
 
 <br />
 
@@ -63,7 +61,7 @@
 {
     <ViewOperaDetails ImageMapId="@SelectedImageMapId" />
     <br /> 
-    <button class="btn-close" @onclick="CloseDetails"></button>
+    <button class="btn-primary" @onclick="CloseDetails">Chiudi Dettagli</button>
 }
 </div>
 

@@ -16,9 +16,11 @@ namespace ZoomOpera.DTOs
 
         public OperaImageDTO() { }
 
-        public OperaImageDTO(string image)
+        public OperaImageDTO(string image, int height, int width)
         {
             Image = image;
-        }
+            Height = height;
+            Width = width;
+    }
     }
 }
